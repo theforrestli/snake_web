@@ -1,0 +1,29 @@
+{
+  "name": "snake_web",
+  "version": "1.0.0",
+  "description": "multi-player snake game web front",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lijiaqigreat/snake_web.git"
+  },
+  "keywords": [
+    "snake"
+  ],
+  "author": "Jiaqi Li",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lijiaqigreat/snake_web/issues"
+  },
+  "homepage": "https://github.com/lijiaqigreat/snake_web#readme",
+  "devDependencies": {
+    "bootstrap": "^3.3.5",
+    "gulp": "^3.9.0",
+    "gulp-less": "^3.0.3",
+    "gulp-mustache": "^1.1.1",
+    "gulp-shell": "^0.4.2"
+  }
+}
