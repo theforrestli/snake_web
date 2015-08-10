@@ -1,0 +1,65 @@
+/*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+canvas {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+input {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+input {
+  line-height: normal;
+}
+
+#overlays {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#welcome {
+  position: relative;
+  width: 200px;
+  margin: 20% auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 6px;
+}
+
+#welcome:hover {
+  background: red;
+}
+
+#welcome:visited {
+  background: red;
+}
+
+.border {
+  border-radius: 6px;
+  padding: 6px;
+}
+
+/*# sourceMappingURL=main.css.map */

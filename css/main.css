@@ -1,6 +1,12 @@
 a {
   background: red;
 }
+#welcome2 {
+  background: #010;
+}
+#welcome2:hover {
+  background: #020;
+}
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 html {
   font-family: sans-serif;
@@ -195,8 +201,15 @@ th {
   border-radius: 6px;
   padding: 6px;
 }
+#welcome:hover {
+  background: red;
+}
+#welcome:visited {
+  background: red;
+}
 .border {
   border-radius: 6px;
   padding: 6px;
 }
+
 /*# sourceMappingURL=main.css.map */
