@@ -24,6 +24,7 @@
     "browser-sync": "^2.8.2",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.0",
+    "gulp-browserify": "^0.5.1",
     "gulp-ext-replace": "^0.2.0",
     "gulp-less": "^3.0.3",
     "gulp-mustache": "^1.1.1",

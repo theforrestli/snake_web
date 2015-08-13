@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var path = require('path');
-
 var less = require('gulp-less');
 var shell = require('gulp-shell');
 var babel = require('gulp-babel');
@@ -9,6 +8,7 @@ var uncss = require('gulp-uncss');
 var ext_replace=require('gulp-ext-replace');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
+var browserify = require('gulp-browserify');
 
 var browserSync = require("browser-sync").create();
 var reload=browserSync.reload;
@@ -30,13 +30,21 @@ gulp.task('html',function(){ return gulp.src('index.mustache')
   .pipe(ext_replace('.debug.html'))
   .pipe(gulp.dest("./"));
 });
-gulp.task('js',function(){ return gulp.src('js/main.js')
-  .pipe(ext_replace('.min.js'))
+
+gulp.task('js',function(){ gulp.src('js6/**/*.js')
   .pipe(sourcemaps.init())
   .pipe(babel())
-  .pipe(uglify())
   .pipe(sourcemaps.write('./'))
   .pipe(gulp.dest('js/'));
+  gulp.src('js/main.js')
+  .pipe(ext_replace('.min.js'))
+  .pipe(sourcemaps.init())
+  .pipe(browserify({
+    debug:true
+  }))
+  .pipe(uglify())
+  .pipe(sourcemaps.write('./'))
+  .pipe(gulp.dest('js'));
 });
 gulp.task('build',['less', 'html', 'js']);
 
@@ -64,6 +72,6 @@ gulp.task('serve', ['build'], function () {
     }
   });
   gulp.watch(['css/**/*.less'],['less',reload]);
-  gulp.watch(['index.mustache','partials/**'], reload);
-  gulp.watch(['js/**'],['js',reload]);
+  gulp.watch(['index.mustache','partials/**'], ['html',reload]);
+  gulp.watch(['js6/**'],['js',reload]);
 });

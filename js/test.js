@@ -1,4 +1,14 @@
-export function sum(x, y) {
-  return x + y;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.sum = sum;
+
+function sum(a, b) {
+  return a + b;
 }
-export var pi = 3.141593;
+
+var pi = 3.14;
+exports.pi = pi;
+//# sourceMappingURL=test.js.map
