@@ -1,4 +1,29 @@
 {
+  "TODO":[
+    "read socketio",
+    "define interface"
+  ],
+  "interface":{
+    "description": "only in game commands",
+    "exclude":[
+      "chat",
+      "connection",
+      "initialize"
+    ],
+    "example":{
+      "c":"move",
+      "s":"id",
+      "x":1,
+      "y":2
+    },
+    "c_list":{
+      "move":"move a snake",
+      "reset":"a snake dies",
+      "boost":"change a snakes mode",
+      "food":"new food",
+      "delete":"a snake leaves"
+    }
+  },
   "notes": [
     ""
   ],
@@ -37,4 +62,3 @@
     ]
   }
 }
-
