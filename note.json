@@ -5,5 +5,36 @@
   "options": {
     "name": "string",
     "url": "string"
+  },
+  "restful": {
+    "game":{
+      "width":100,
+      "height":100,
+      "snakes":{
+        "x": 2,
+        "y": 2,
+        "mode":0
+      },
+      "tiles": [
+        {
+          "d":0
+        }
+      ]
+    },
+    "diff":[
+      {
+        "c":"m",
+        "s":"id"
+      },
+      {
+        "c":"d",
+        "s":"id",
+        "d":2
+      },
+      {
+        "c":""
+      }
+    ]
   }
 }
+
