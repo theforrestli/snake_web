@@ -1,7 +1,6 @@
 {
   "TODO":[
-    "read socketio",
-    "define interface"
+    "REST API"
   ],
   "interface":{
     "description": "only in game commands",
@@ -21,7 +20,33 @@
       "reset":"a snake dies",
       "boost":"change a snakes mode",
       "food":"new food",
-      "delete":"a snake leaves"
+      "delete":"a snake leaves",
+      "new":"a new snake entered"
+    }
+  },
+  "rest_api": {
+    "description": "only for initialize",
+    "content":{
+      "width": 100,
+      "height": 100,
+      "grid": [
+        "t":1,
+        "d":{
+          "d":0,
+          "s":0
+        }
+      ],
+      "snakes":[
+        {
+          "name": "foo",
+          "index":0,
+          "x":1,
+          "y":1,
+          "d":0,
+          "length":3,
+          "age":10
+        }
+      ]
     }
   },
   "notes": [
