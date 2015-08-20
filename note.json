@@ -1,6 +1,9 @@
 {
   "TODO":[
-    "REST API"
+    "REST API",
+    "better error system",
+    "I18n",
+    "testing"
   ],
   "interface":{
     "description": "only in game commands",
@@ -17,6 +20,7 @@
     },
     "c_list":{
       "move":"move a snake",
+      "dir":"change direction",
       "reset":"a snake dies",
       "boost":"change a snakes mode",
       "food":"new food",
@@ -27,6 +31,7 @@
   "rest_api": {
     "description": "only for initialize",
     "content":{
+      version:1,
       "width": 100,
       "height": 100,
       "grid": [
