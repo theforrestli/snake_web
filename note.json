@@ -3,7 +3,28 @@
     "REST API",
     "better error system",
     "I18n",
-    "testing"
+    "testing",
+    "snake.age",
+    {
+      "strong validation": false,
+      "version": false,
+      "filter game commands": false
+    }
+  ],
+  "decisions":[
+    {
+      "claim": "don't abbriviate json attr's",
+      "support": [
+        "max web usage: 100 cmd * 50B = 5KB/s"
+      ]
+    },
+    {
+      "claim": "rerender box on update",
+      "support": [
+        "each box have independent animation",
+        "easy to update"
+      ]
+    }
   ],
   "interface":{
     "description": "only in game commands",
@@ -21,7 +42,7 @@
     "c_list":{
       "move":"move a snake",
       "dir":"change direction",
-      "reset":"a snake dies",
+      "join":"a snake dies",
       "boost":"change a snakes mode",
       "food":"new food",
       "delete":"a snake leaves",
@@ -31,13 +52,14 @@
   "rest_api": {
     "description": "only for initialize",
     "content":{
-      version:1,
+      "version":1,
       "width": 100,
       "height": 100,
       "grid": [
         "t":1,
         "d":{
-          "d":0,
+          "h":0,
+          "t":0,
           "s":0
         }
       ],
@@ -45,10 +67,16 @@
         {
           "name": "foo",
           "index":0,
-          "x":1,
-          "y":1,
-          "d":0,
+          "head":{
+            "x":1,
+            "y":1
+          },
+          "tail":{
+            "x":2,
+            "y":2
+          },
           "length":3,
+          "remain":0,
           "age":10
         }
       ]

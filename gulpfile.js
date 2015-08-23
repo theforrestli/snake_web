@@ -30,21 +30,38 @@ gulp.task('html',function(){ return gulp.src('index.mustache')
   .pipe(ext_replace('.debug.html'))
   .pipe(gulp.dest("./"));
 });
+gulp.task('babel', function(){
+  gulp.src('js6/**/*.js')
+    .pipe(sourcemaps.init())
+    .pipe(babel())
+    .on('error', swallowError)
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('js/'));
+})
 
-gulp.task('js',function(){ gulp.src('js6/**/*.js')
-  .pipe(sourcemaps.init())
-  .pipe(babel())
-  .pipe(sourcemaps.write('./'))
-  .pipe(gulp.dest('js/'));
+gulp.task('js',['babel'],function(){
+
+  gulp.src('js/test/main.js')
+    .pipe(ext_replace('.min.js'))
+    .pipe(sourcemaps.init())
+    .pipe(browserify({
+      debug:true
+    }))
+    .on('error', swallowError)
+    .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('js/test'));
+
   gulp.src('js/main.js')
-  .pipe(ext_replace('.min.js'))
-  .pipe(sourcemaps.init())
-  .pipe(browserify({
-    debug:true
-  }))
-  .pipe(uglify())
-  .pipe(sourcemaps.write('./'))
-  .pipe(gulp.dest('js'));
+    .pipe(ext_replace('.min.js'))
+    .pipe(sourcemaps.init())
+    .pipe(browserify({
+      debug:true
+    }))
+    .on('error', swallowError)
+    .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('js'));
 });
 gulp.task('build',['less', 'html', 'js']);
 
@@ -75,3 +92,8 @@ gulp.task('serve', ['build'], function () {
   gulp.watch(['index.mustache','partials/**'], ['html',reload]);
   gulp.watch(['js6/**'],['js',reload]);
 });
+
+function swallowError (error) {
+  console.log(error.toString());
+  this.emit('end');
+}
