@@ -96,24 +96,37 @@ describe("map", () => {
 describe("Game", () => {
   var game;
   var cmds = {
-    "j22":[
+    "j222":[
       "join",
       {
         "name": "j22",
-        "remain":0,
+        "remain":2,
         "x":2,
         "y":2,
       }
     ],
-    "j24":[
+    "j242":[
       "join",
       {
         "name": "j24",
-        "remain":0,
+        "remain":2,
         "x":2,
         "y":4,
       }
     ],
+    "d00":[
+      "direction",
+      {
+        s:0,
+        d:0,
+      }
+    ],
+    "m0":[
+      "move",
+      {
+        s:0,
+      }
+    ]
 
   }
   beforeEach(() => {
@@ -124,35 +137,44 @@ describe("Game", () => {
     }
     game = new Game(map(param).game);
   });
-  describe("#handleCommand", () => {
+  describe("#handleCommands", () => {
     describe("join", () => {
       it("can join many snakes", () => {
         var box1 = game.getBox({x:2,y:2});
         var box2 = game.getBox({x:2,y:4});
 
-        game.handleCommand(cmds.j22);
+        game.handleCommands([cmds.j222]);
         expect(game.getSnakeSize()).to.be(1);
         expect(box1[0] === C.BT_SNAKE);
 
-        game.handleCommand(cmds.j24);
+        game.handleCommands([cmds.j242]);
         expect(game.getSnakeSize()).to.be(2);
         expect(box2[0] === C.BT_SNAKE);
       });
       it("cannot add snake at the same position", () => {
-        game.handleCommand(cmds.j22);
-        game.handleCommand(cmds.j22);
+        game.handleCommands([cmds.j22]);
+        game.handleCommands([cmds.j22]);
         expect(game.getSnakeSize()).to.be(1);
+      });
+    })
+    describe("direction", () => {
+      it("can change direction", () => {
+        game.handleCommands([
+          cmds.j222,
+          cmds.d00,
+        ]);
       });
     })
     describe.skip("move", () => {
       it("moves along direction", () => {
-        // var snake = game.snake[0];
-        // validateSnake(game,snake);
-        // game.handleCommand({
-        //   cmd:"move",
-        //   s:0
-        // });
-        // validateSnake(game,snake);
+        game.handleCommands([
+          cmds.j222,
+          cmds.d00,
+          cmds.m0,
+        ]);
+        var snake = game.snake[0];
+        validateSnake(game,snake);
+        validateSnake(game,snake);
       })
     })
   })

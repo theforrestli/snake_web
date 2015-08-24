@@ -29,13 +29,17 @@ var Game = (function () {
   }
 
   _createClass(Game, [{
-    key: "handleCommand",
-    value: function handleCommand(cmd) {
-      try {
-        handlers[cmd[0]](cmd[1], this);
-      } catch (e) {
-        console.error(e);
-      }
+    key: "handleCommands",
+    value: function handleCommands(cmds) {
+      var _this = this;
+
+      cmds.forEach(function (cmd) {
+        try {
+          handlers[cmd[0]](cmd[1], _this);
+        } catch (e) {
+          console.error(e);
+        }
+      });
     }
   }, {
     key: "getBox",

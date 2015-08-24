@@ -11,12 +11,14 @@ export default class Game {
       nsnake,
     };
   }
-  handleCommand(cmd){
-    try{
-      handlers[cmd[0]](cmd[1],this);
-    }catch(e){
-      console.error(e);
-    }
+  handleCommands(cmds){
+    cmds.forEach((cmd) => {
+      try{
+        handlers[cmd[0]](cmd[1],this);
+      }catch(e){
+        console.error(e);
+      }
+    });
   }
   getBox({x,y}){
     return this.json.grid[y*this.json.width+x];

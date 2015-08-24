@@ -20,4 +20,20 @@ var BT_EMPTY = 0;
 exports.BT_EMPTY = BT_EMPTY;
 var BT_SNAKE = 1;
 exports.BT_SNAKE = BT_SNAKE;
+var D = {
+  EAST: 0,
+  SOUTH: 1,
+  WEST: 2,
+  NORTH: 3,
+  OTHER: 4,
+  OTHER_T: 6,
+  OP_MASK: 2
+};
+exports.D = D;
+var B = {
+  EMPTY: 0,
+  SNAKE: 1,
+  food: 2
+};
+exports.B = B;
 //# sourceMappingURL=consts.js.map

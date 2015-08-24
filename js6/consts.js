@@ -8,4 +8,17 @@ export var D_OP_MASK = 2;
 
 export var BT_EMPTY = 0;
 export var BT_SNAKE = 1;
-
+export var D = {
+  EAST   : 0,
+  SOUTH  : 1,
+  WEST   : 2,
+  NORTH  : 3,
+  OTHER  : 4,
+  OTHER_T: 6,
+  OP_MASK: 2,
+}
+export var B = {
+  EMPTY: 0,
+  SNAKE: 1,
+  food : 2,
+}
