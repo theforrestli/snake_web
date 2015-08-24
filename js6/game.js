@@ -1,4 +1,4 @@
-import * as C from './consts.js';
+import {D,B,H} from './consts';
 export default class Game {
   constructor(json){
     if(json.version != 1)
@@ -16,7 +16,7 @@ export default class Game {
       try{
         handlers[cmd[0]](cmd[1],this);
       }catch(e){
-        console.error(e);
+        console.error(e.message);
       }
     });
   }
@@ -42,17 +42,17 @@ var handlers = {
     var snake = json.snakes[data.s];
     var p1 = snake.head;
     var b1 = game.getBox(snake.head);
-    if(b1[1].h == D_OTHER){
+    if(b1[1].h == D.OTHER){
       return;
     }
     var p = applyDirection(snake.head,head.d.h);
     var box = game.getBox(p);
     switch(box.t){
-    case BT_FOOD:
+    case B.FOOD:
       snake.remain += box.d.q;
       box.t = BT_EMPTY;
       box.d = {};
-    case BT_EMPTY:
+    case B.EMPTY:
       box.t = BT_SNAKE;
       box.d = {
         d:snake.d,
@@ -63,8 +63,8 @@ var handlers = {
       }else{
       }
       break;
-    case BT_BLOCK:
-    case BT_SNAKE:
+    case B.BLOCK:
+    case B.SNAKE:
       box = game.getBox(sanke);
       while(box.t == BT_SNAKE && box.d.s == snake.index){
         var {x,y} = applyDirection({x,y},box.d.d ^ D_OP_MASK);
@@ -76,14 +76,16 @@ var handlers = {
       break;
     }
   },
+
   join(data,game){
     var {x,y} = data;
     var box = game.getBox({x,y});
+    var json = game.json;
 
-    if(box[0] != C.BT_EMPTY){
+    if(box[0] != B.EMPTY){
       throw "box taken";
     }
-    var index = findNextEmpty(game.json.snakes);
+    var index = findNextEmpty(json.snakes);
 
     var snake={
       age: 0,
@@ -97,18 +99,22 @@ var handlers = {
 
     game.setSnake(snake);
 
-    game.json.snakes[snake.index]=snake;
-    box[0]=C.BT_SNAKE;
+    json.snakes[snake.index]=snake;
+    box[0]=B.SNAKE;
     box[1]={
-      h:C.D_OTHER,
+      h:D.OTHER,
       s:snake.index,
-      t:C.D_OTHER_T,
+      t:D.OTHER_T,
     };
+  },
+  direction(data,game){
+    var json = game.json;
+    var snake = json.snakes[data.s];
+    var box1 = game.getBox(snake.head);
+    box1[1].h = data.d;
   }
 }
 function findNextEmpty(list){
-
-  console.log(list);
   var t=0;
   while(list[t] != null){
     t++;

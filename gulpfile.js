@@ -36,7 +36,7 @@ var jsConfigs = [
 ]
 function rebundle(cfg){
   cfg.bundler.bundle()
-    .on('error', function(){this.emit("end");})
+    .on('error', swallowError)
     .pipe(source(cfg.outFile))
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true }))
@@ -101,7 +101,6 @@ gulp.task('serve', ['build'], function () {
 });
 
 function swallowError (error) {
-  console.error(error);
+  console.error(error.message);
   this.emit("end");
-  this.end();
 }

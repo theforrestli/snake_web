@@ -20,5 +20,17 @@ export var D = {
 export var B = {
   EMPTY: 0,
   SNAKE: 1,
-  food : 2,
+  FOOD : 2,
+}
+export var H = {
+  applyDirection({x,y},d){
+    switch(d){
+      case D_NORTH: y-=1; break;
+      case D_SOUTH: y+=1; break;
+      case D_WEST: x-=1; break;
+      case D_EAST: x+=1; break;
+      default: break;
+    }
+    return {x,y};
+  }
 }
