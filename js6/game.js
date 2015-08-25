@@ -16,7 +16,7 @@ export default class Game {
       try{
         handlers[cmd[0]](cmd[1],this);
       }catch(e){
-        console.error(e.message);
+        console.error(e);
       }
     });
   }
@@ -45,38 +45,46 @@ var handlers = {
     if(b1[1].h == D.OTHER){
       return;
     }
-    var p = applyDirection(snake.head,head.d.h);
-    var box = game.getBox(p);
-    switch(box.t){
+    var p2 = H.applyDirection(p1,b1[1].h);
+    var b2 = game.getBox(p2);
+    switch(b2[0]){
     case B.FOOD:
-      snake.remain += box.d.q;
-      box.t = BT_EMPTY;
-      box.d = {};
+      snake.remain += b2[1].q;
+      b2[0] = B.EMPTY;
+      b2[1] = {};
     case B.EMPTY:
-      box.t = BT_SNAKE;
-      box.d = {
-        d:snake.d,
+      b2[0] = B.SNAKE;
+      b2[1] = {
+        h:b1[1].h,
+        t:b1[1].h ^ D.OP_MASK,
         s:snake.index
       };
+      snake.head = p2;
       if(snake.remain > 0){
         snake.remain--;
-      }else{
+        snake.length++;
+        return;
       }
+      p1 = snake.tail;
+      b1 = game.getBox(p1);
+      p2 = H.applyDirection(p1, b1[1].h);
+      b2 = game.getBox(p2);
+      snake.tail = p2;
+      b1[0]=B.EMPTY;
+      b1[1]={};
       break;
     case B.BLOCK:
     case B.SNAKE:
-      box = game.getBox(sanke);
-      while(box.t == BT_SNAKE && box.d.s == snake.index){
-        var {x,y} = applyDirection({x,y},box.d.d ^ D_OP_MASK);
-        var b2 = game.getBox({x,y});
-        box.t = BT_EMPTY;
-        box.d = {};
-        box = b2;
+      while(b1[0] == B.SNAKE && b1[1].s == snake.index){
+        p1 = H.applyDirection(p1, b1[1].t);
+        var b2 = game.getBox(p1);
+        b1[0] = B.EMPTY;
+        b1[1] = {};
+        b1 = b2;
       }
       break;
     }
   },
-
   join(data,game){
     var {x,y} = data;
     var box = game.getBox({x,y});
@@ -95,8 +103,8 @@ var handlers = {
       name: data.name,
       remain: data.remain,
       tail: {x,y},
-    }
-
+      pretty: data.pretty
+    };
     game.setSnake(snake);
 
     json.snakes[snake.index]=snake;
@@ -111,7 +119,22 @@ var handlers = {
     var json = game.json;
     var snake = json.snakes[data.s];
     var box1 = game.getBox(snake.head);
+
+    if(box1[1].t == data.d){
+      throw "move oppo";
+    }
+
     box1[1].h = data.d;
+  },
+  food(data,game){
+    var b1 = game.getBox(data);
+    if(b1[0] != B.EMPTY){
+      throw "box taken";
+    }
+    b1[0] = B.FOOD;
+    b1[1] = {
+      q: data.q
+    };
   }
 }
 function findNextEmpty(list){

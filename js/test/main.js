@@ -95,7 +95,7 @@ var Game = (function () {
         try {
           handlers[cmd[0]](cmd[1], _this);
         } catch (e) {
-          console.error(e.message);
+          console.error(e);
         }
       });
     }
@@ -139,41 +139,46 @@ var handlers = {
     if (b1[1].h == _consts.D.OTHER) {
       return;
     }
-    var p = applyDirection(snake.head, head.d.h);
-    var box = game.getBox(p);
-    switch (box.t) {
+    var p2 = _consts.H.applyDirection(p1, b1[1].h);
+    var b2 = game.getBox(p2);
+    switch (b2[0]) {
       case _consts.B.FOOD:
-        snake.remain += box.d.q;
-        box.t = BT_EMPTY;
-        box.d = {};
+        snake.remain += b2[1].q;
+        b2[0] = _consts.B.EMPTY;
+        b2[1] = {};
       case _consts.B.EMPTY:
-        box.t = BT_SNAKE;
-        box.d = {
-          d: snake.d,
+        b2[0] = _consts.B.SNAKE;
+        b2[1] = {
+          h: b1[1].h,
+          t: b1[1].h ^ _consts.D.OP_MASK,
           s: snake.index
         };
+        snake.head = p2;
         if (snake.remain > 0) {
           snake.remain--;
-        } else {}
+          snake.length++;
+          return;
+        }
+        p1 = snake.tail;
+        b1 = game.getBox(p1);
+        p2 = _consts.H.applyDirection(p1, b1[1].h);
+        b2 = game.getBox(p2);
+        snake.tail = p2;
+        b1[0] = _consts.B.EMPTY;
+        b1[1] = {};
         break;
       case _consts.B.BLOCK:
       case _consts.B.SNAKE:
-        box = game.getBox(sanke);
-        while (box.t == BT_SNAKE && box.d.s == snake.index) {
-          var _applyDirection = applyDirection({ x: x, y: y }, box.d.d ^ D_OP_MASK);
-
-          var x = _applyDirection.x;
-          var y = _applyDirection.y;
-
-          var b2 = game.getBox({ x: x, y: y });
-          box.t = BT_EMPTY;
-          box.d = {};
-          box = b2;
+        while (b1[0] == _consts.B.SNAKE && b1[1].s == snake.index) {
+          p1 = _consts.H.applyDirection(p1, b1[1].t);
+          var b2 = game.getBox(p1);
+          b1[0] = _consts.B.EMPTY;
+          b1[1] = {};
+          b1 = b2;
         }
         break;
     }
   },
-
   join: function join(data, game) {
     var x = data.x;
     var y = data.y;
@@ -193,9 +198,9 @@ var handlers = {
       length: 1,
       name: data.name,
       remain: data.remain,
-      tail: { x: x, y: y }
+      tail: { x: x, y: y },
+      pretty: data.pretty
     };
-
     game.setSnake(snake);
 
     json.snakes[snake.index] = snake;
@@ -210,7 +215,22 @@ var handlers = {
     var json = game.json;
     var snake = json.snakes[data.s];
     var box1 = game.getBox(snake.head);
+
+    if (box1[1].t == data.d) {
+      throw "move oppo";
+    }
+
     box1[1].h = data.d;
+  },
+  food: function food(data, game) {
+    var b1 = game.getBox(data);
+    if (b1[0] != _consts.B.EMPTY) {
+      throw "box taken";
+    }
+    b1[0] = _consts.B.FOOD;
+    b1[1] = {
+      q: data.q
+    };
   }
 };
 function findNextEmpty(list) {
@@ -296,17 +316,28 @@ var _game = require('../game');
 
 var _game2 = _interopRequireDefault(_game);
 
-function validateBox(game, _ref) {
-  var x = _ref.x;
-  var y = _ref.y;
-  var box = _ref.box;
-}
-function validateSnake(game, snake) {
+function validateGame(game) {}
+function validateSnake(game, snake, full) {
+  expect(snake).to.only.have.keys(['age', 'head', 'index', 'length', 'name', 'pretty', 'remain', 'tail']);
+  expect(snake.head).to.only.have.keys(['x', 'y']);
+  expect(game.getBox(snake.head)).not.to.eql(null);
+
+  expect(game.json.snakes[snake.index]).to.be(snake);
+
+  expect(snake.length).to.be.above(0);
+
+  expect(snake.remain).to.be.above(-1);
+
+  expect(snake.tail).to.only.have.keys(['x', 'y']);
+  expect(game.getBox(snake.tail)).not.to.eql(null);
+
   var p1 = snake.head;
   var b1 = game.getBox(p1);
+  expect(b1[1].s == snake.index);
   if (b1[1].h == _consts.D.OTHER) {
+    //not moving
     expect(snake.length).to.be(1);
-    expect(b1[1].t == _consts.D.OTHER);
+    expect(b1[1].t == _consts.D.OTHER_T);
     expect(snake.tail).to.eql(p1);
     return;
   }
@@ -314,15 +345,17 @@ function validateSnake(game, snake) {
   var b2 = game.getBox(p2);
   var length = 1;
   while (b2[0] == _consts.B.SNAKE && b2[1].s == snake.index) {
+    expect(b1[1].s == snake.index);
     if (b1 == b2) {
       expect(b1[1].t).to.be(_consts.D.OTHER_T);
       break;
     }
-    expect(b2[1].h == b1[1].t);
+    expect(b2[1].h == b1[1].t ^ _consts.D.OP_MASK);
     p1 = p2;
     b1 = b2;
-    p2 = applyDirection(p1, b1[1].t);
+    p2 = _consts.H.applyDirection(p1, b1[1].t);
     b2 = game.getBox(p2);
+    length++;
   }
   expect(snake.length).to.be(length);
   expect(snake.tail).to.eql(p1);
@@ -350,8 +383,17 @@ describe("Game", function () {
       s: 0,
       d: _consts.D.WEST
     }],
+    "d0S": ["direction", {
+      s: 0,
+      d: _consts.D.SOUTH
+    }],
     "m0": ["move", {
       s: 0
+    }],
+    "f242": ["food", {
+      x: 2,
+      y: 4,
+      q: 2
     }]
   };
   beforeEach(function () {
@@ -406,15 +448,63 @@ describe("Game", function () {
         box[1].h = _consts.D.WEST;
         box[1].t = _consts.D.EAST;
         validateSnake(game, snake);
-        game.handleCommands([cmds.m0E]);
-        expect(box[1].h == _consts.D.EAST);
+        game.handleCommands([cmds.d0E]);
+        expect(box[1].h).to.be(_consts.D.WEST);
       });
     });
-    describe.skip("move", function () {
-      it("moves along direction", function () {
-        game.handleCommands([cmds.j222, cmds.d00, cmds.m0]);
-        var snake = game.snake[0];
-        validateSnake(game, snake);
+    describe("move", function () {
+      it("moves at length 1", function () {
+        game.handleCommands([cmds.j222]);
+        game.handleCommands([cmds.d0E]);
+        var snake = game.json.snakes[0];
+        snake.remain = 0;
+        for (var t = 0; t < 2; t++) {
+          game.handleCommands([cmds.m0]);
+          validateSnake(game, snake);
+          expect(snake.length).to.be(1);
+        }
+      });
+      it("moves at length 2", function () {
+        game.handleCommands([cmds.j222, cmds.d0E]);
+        var snake = game.json.snakes[0];
+        snake.remain = 1;
+        var lengths = [2, 2];
+        for (var t = 0; t < 2; t++) {
+          game.handleCommands([cmds.m0]);
+          validateSnake(game, snake);
+          expect(snake.length).to.be(lengths[t]);
+        }
+      });
+      it("moves at length 3", function () {
+        game.handleCommands([cmds.j222, cmds.d0E]);
+        var snake = game.json.snakes[0];
+        snake.remain = 2;
+        var lengths = [2, 3, 3];
+        for (var t = 0; t < 3; t++) {
+          game.handleCommands([cmds.m0]);
+          validateSnake(game, snake);
+          expect(snake.length).to.be(lengths[t]);
+        }
+      });
+    });
+    describe("food", function () {
+      it("can be placed", function () {
+        game.handleCommands([cmds.f242]);
+        expect(game.getBox({ x: 2, y: 4 })).to.eql([_consts.B.FOOD, {
+          q: 2
+        }]);
+      });
+      it("cannot override block", function () {
+        game.handleCommands([cmds.j242, cmds.f242]);
+        expect(game.getBox({ x: 2, y: 4 })[0]).to.be(_consts.B.SNAKE);
+      });
+      it("can be eaten", function () {
+        game.handleCommands([cmds.j222, cmds.d0S]);
+        var snake = game.json.snakes[0];
+        snake.remain = 1;
+        game.handleCommands([cmds.f242, cmds.m0, cmds.m0]);
+        expect(snake.remain).to.be(1);
+        expect(snake.length).to.be(3);
       });
     });
   });

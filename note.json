@@ -5,8 +5,13 @@
     "I18n",
     "testing",
     "snake.age",
+    "catch narrower errors",
     {
-      "strong validation": false,
+      "main": "linter",
+      "jshint.vim": "good"
+    },
+    {
+      "main": "strong validation",
       "version": false,
       "filter game commands": false
     }
@@ -49,74 +54,11 @@
       "new":"a new snake entered"
     }
   },
-  "rest_api": {
-    "description": "only for initialize",
-    "content":{
-      "version":1,
-      "width": 100,
-      "height": 100,
-      "grid": [
-        "t":1,
-        "d":{
-          "h":0,
-          "t":0,
-          "s":0
-        }
-      ],
-      "snakes":[
-        {
-          "name": "foo",
-          "index":0,
-          "head":{
-            "x":1,
-            "y":1
-          },
-          "tail":{
-            "x":2,
-            "y":2
-          },
-          "length":3,
-          "remain":0,
-          "age":10
-        }
-      ]
-    }
-  },
-  "notes": [
-    ""
-  ],
   "options": {
     "name": "string",
     "url": "string"
   },
-  "restful": {
-    "game":{
-      "width":100,
-      "height":100,
-      "snakes":{
-        "x": 2,
-        "y": 2,
-        "mode":0
-      },
-      "tiles": [
-        {
-          "d":0
-        }
-      ]
-    },
-    "diff":[
-      {
-        "c":"m",
-        "s":"id"
-      },
-      {
-        "c":"d",
-        "s":"id",
-        "d":2
-      },
-      {
-        "c":""
-      }
-    ]
-  }
+  "principles": [
+    "command validates everyting before making changes"
+  ]
 }
