@@ -114,14 +114,14 @@ var Game = (function () {
     }
   }, {
     key: "setSnake",
-    value: function setSnake(snake) {
-      if (this.json.snakes[snake.index] != null) {
+    value: function setSnake(index, snake) {
+      if (this.json.snakes[index] != null) {
         this.cache.nsnake--;
       }
       if (snake != null) {
         this.cache.nsnake++;
       }
-      this.json.snakes[snake.index] = snake;
+      this.json.snakes[index] = snake;
     }
   }]);
 
@@ -169,13 +169,7 @@ var handlers = {
         break;
       case _consts.B.BLOCK:
       case _consts.B.SNAKE:
-        while (b1[0] == _consts.B.SNAKE && b1[1].s == snake.index) {
-          p1 = _consts.H.applyDirection(p1, b1[1].t);
-          var b2 = game.getBox(p1);
-          b1[0] = _consts.B.EMPTY;
-          b1[1] = {};
-          b1 = b2;
-        }
+        destroySnake(game, snake);
         break;
     }
   },
@@ -201,7 +195,7 @@ var handlers = {
       tail: { x: x, y: y },
       pretty: data.pretty
     };
-    game.setSnake(snake);
+    game.setSnake(index, snake);
 
     json.snakes[snake.index] = snake;
     box[0] = _consts.B.SNAKE;
@@ -231,6 +225,13 @@ var handlers = {
     b1[1] = {
       q: data.q
     };
+  },
+  leave: function leave(data, game) {
+    var snake = game.json.snakes[data.s];
+    if (snake == null) {
+      throw "snake not exist";
+    }
+    destroySnake(game, snake);
   }
 };
 function findNextEmpty(list) {
@@ -239,6 +240,17 @@ function findNextEmpty(list) {
     t++;
   }
   return t;
+}
+function destroySnake(game, snake) {
+  var p1 = snake.head;
+  var b1 = game.getBox(snake.head);
+  while (b1[0] == _consts.B.SNAKE && b1[1].s == snake.index) {
+    p1 = _consts.H.applyDirection(p1, b1[1].t);
+    b1[0] = _consts.B.EMPTY;
+    b1[1] = {};
+    b1 = game.getBox(p1);
+  }
+  game.setSnake(snake.index, null);
 }
 module.exports = exports["default"];
 
@@ -394,6 +406,12 @@ describe("Game", function () {
       x: 2,
       y: 4,
       q: 2
+    }],
+    "l0": ["leave", {
+      s: 0
+    }],
+    "l1": ["leave", {
+      s: 1
     }]
   };
   beforeEach(function () {
@@ -505,6 +523,21 @@ describe("Game", function () {
         game.handleCommands([cmds.f242, cmds.m0, cmds.m0]);
         expect(snake.remain).to.be(1);
         expect(snake.length).to.be(3);
+      });
+    });
+    describe("leave", function () {
+      it("a snake leaves", function () {
+        game.handleCommands([cmds.j222, cmds.l0]);
+        expect(game.getSnakeSize()).to.be(0);
+        expect(game.getBox({ x: 2, y: 2 })).to.eql([_consts.B.EMPTY, {}]);
+      });
+      it("cannot leave nothing", function () {
+        game.handleCommands([cmds.j222, cmds.l1]);
+        expect(game.getSnakeSize()).to.be(1);
+      });
+      it("cannot leave twice", function () {
+        game.handleCommands([cmds.j222, cmds.l0, cmds.l0]);
+        expect(game.getSnakeSize()).to.be(0);
       });
     });
   });

@@ -26,14 +26,14 @@ export default class Game {
   getSnakeSize(){
     return this.cache.nsnake;
   }
-  setSnake(snake){
-    if(this.json.snakes[snake.index] != null){
+  setSnake(index,snake){
+    if(this.json.snakes[index] != null){
       this.cache.nsnake--;
     }
     if(snake != null){
       this.cache.nsnake++;
     }
-    this.json.snakes[snake.index]=snake;
+    this.json.snakes[index]=snake;
   }
 }
 var handlers = {
@@ -75,13 +75,7 @@ var handlers = {
       break;
     case B.BLOCK:
     case B.SNAKE:
-      while(b1[0] == B.SNAKE && b1[1].s == snake.index){
-        p1 = H.applyDirection(p1, b1[1].t);
-        var b2 = game.getBox(p1);
-        b1[0] = B.EMPTY;
-        b1[1] = {};
-        b1 = b2;
-      }
+      destroySnake(game,snake);
       break;
     }
   },
@@ -105,7 +99,7 @@ var handlers = {
       tail: {x,y},
       pretty: data.pretty
     };
-    game.setSnake(snake);
+    game.setSnake(index,snake);
 
     json.snakes[snake.index]=snake;
     box[0]=B.SNAKE;
@@ -135,6 +129,13 @@ var handlers = {
     b1[1] = {
       q: data.q
     };
+  },
+  leave(data,game){
+    var snake = game.json.snakes[data.s]
+    if(snake == null){
+      throw "snake not exist";
+    }
+    destroySnake(game,snake);
   }
 }
 function findNextEmpty(list){
@@ -144,4 +145,14 @@ function findNextEmpty(list){
   }
   return t;
 }
-
+function destroySnake(game,snake){
+  var p1 = snake.head;
+  var b1 = game.getBox(snake.head);
+  while(b1[0] == B.SNAKE && b1[1].s == snake.index){
+    p1 = H.applyDirection(p1, b1[1].t);
+    b1[0] = B.EMPTY;
+    b1[1] = {};
+    b1 = game.getBox(p1);
+  }
+  game.setSnake(snake.index,null);
+}

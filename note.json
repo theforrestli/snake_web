@@ -47,11 +47,10 @@
     "c_list":{
       "move":"move a snake",
       "dir":"change direction",
-      "join":"a snake dies",
+      "join": "a new snake joins",
       "boost":"change a snakes mode",
       "food":"new food",
-      "delete":"a snake leaves",
-      "new":"a new snake entered"
+      "leave":"a snake leaves"
     }
   },
   "options": {

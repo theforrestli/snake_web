@@ -108,6 +108,16 @@ describe("Game", () => {
         y: 4,
         q: 2
       }
+    ],
+    "l0":[
+      "leave",{
+        s:0
+      }
+    ],
+    "l1":[
+      "leave",{
+        s:1
+      }
     ]
   }
   beforeEach(() => {
@@ -235,6 +245,21 @@ describe("Game", () => {
         ]);
         expect(snake.remain).to.be(1);
         expect(snake.length).to.be(3);
+      });
+    });
+    describe("leave", () => {
+      it("a snake leaves", () => {
+        game.handleCommands([cmds.j222,cmds.l0]);
+        expect(game.getSnakeSize()).to.be(0);
+        expect(game.getBox({x:2,y:2})).to.eql([B.EMPTY,{}]);
+      });
+      it("cannot leave nothing", () => {
+        game.handleCommands([cmds.j222,cmds.l1]);
+        expect(game.getSnakeSize()).to.be(1);
+      })
+      it("cannot leave twice", () => {
+        game.handleCommands([cmds.j222,cmds.l0,cmds.l0]);
+        expect(game.getSnakeSize()).to.be(0);
       });
     });
   });
