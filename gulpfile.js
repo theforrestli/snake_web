@@ -46,7 +46,7 @@ function rebundle(cfg){
 
 gulp.task('shrinkwrap', shell.task('npm shrinkwrap'));
 
-gulp.task('less', function () { return gulp.src('./css/main.less')
+gulp.task('less', function () { return gulp.src('./less/main.less')
   .pipe(sourcemaps.init())
   .pipe(less({
     paths: [ path.join(__dirname, 'node_modules','bootstrap', 'less') ],
@@ -54,7 +54,7 @@ gulp.task('less', function () { return gulp.src('./css/main.less')
   .pipe(sourcemaps.write('./'))
   .pipe(gulp.dest('css/'));
 });
-gulp.task('html',function(){ return gulp.src('index.mustache')
+gulp.task('html',function(){ return gulp.src('./*.mustache')
   .pipe(mustache({
     ext: ""
   }))

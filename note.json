@@ -16,6 +16,18 @@
       "filter game commands": false
     }
   ],
+  "events": [
+    "user input",
+    "web connection",
+  ]
+  "classes": {
+    "game": null,
+    "client": [
+    ],
+    "view": [
+      
+    ]
+  },
   "decisions":[
     {
       "claim": "don't abbriviate json attr's",
