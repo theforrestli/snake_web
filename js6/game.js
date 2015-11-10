@@ -1,6 +1,8 @@
-import {D,B,H} from './consts';
-export default class Game {
+var {D,B,H} = require('./consts');
+var {EventEmitter} = require('events');
+module.exports = class Game extends EventEmitter{
   constructor(json){
+    super();
     if(json.version != 1)
       throw "wrong version";
     this.json = json;
@@ -21,7 +23,8 @@ export default class Game {
     });
   }
   getBox({x,y}){
-    return this.json.grid[y*this.json.width+x];
+    var index = y*this.json.width+x;
+    return this.json.grid[index];
   }
   getSnakeSize(){
     return this.cache.nsnake;
@@ -35,49 +38,60 @@ export default class Game {
     }
     this.json.snakes[index]=snake;
   }
+  setBox({x,y},b2){
+    var index = y*this.json.width+x;
+    var b1 = this.json.grid[index];
+    this.json.grid[index] = b2;
+    this.emit("box",{x,y},b1,b2);
+  }
 }
 var handlers = {
-  move(data,game){
+  tick(data,game){
     var json = game.json;
-    var snake = json.snakes[data.s];
-    var p1 = snake.head;
-    var b1 = game.getBox(snake.head);
-    if(b1[1].h == D.OTHER){
-      return;
-    }
-    var p2 = H.applyDirection(p1,b1[1].h);
-    var b2 = game.getBox(p2);
-    switch(b2[0]){
-    case B.FOOD:
-      snake.remain += b2[1].q;
-      b2[0] = B.EMPTY;
-      b2[1] = {};
-    case B.EMPTY:
-      b2[0] = B.SNAKE;
-      b2[1] = {
-        h:b1[1].h,
-        t:b1[1].h ^ D.OP_MASK,
-        s:snake.index
-      };
-      snake.head = p2;
-      if(snake.remain > 0){
-        snake.remain--;
-        snake.length++;
+    json.snakes.forEach(function(snake){
+      if(snake === undefined){
         return;
       }
-      p1 = snake.tail;
-      b1 = game.getBox(p1);
-      p2 = H.applyDirection(p1, b1[1].h);
-      b2 = game.getBox(p2);
-      snake.tail = p2;
-      b1[0]=B.EMPTY;
-      b1[1]={};
-      break;
-    case B.BLOCK:
-    case B.SNAKE:
-      destroySnake(game,snake);
-      break;
-    }
+      if(--snake.tick !== 0){
+        return;
+      }
+      snake.tick = 1; //TODO
+      var p1 = snake.head;
+      var b1 = game.getBox(snake.head);
+      if(b1[1].h == D.OTHER){
+        return;
+      }
+      var p2 = H.applyDirection(p1,b1[1].h);
+      var b2 = game.getBox(p2);
+      switch(b2[0]){
+      case B.FOOD:
+        snake.remain += b2[1].q;
+        game.setBox(p2,[ B.EMPTY, {} ])
+      case B.EMPTY:
+        game.setBox(p2,[ B.SNAKE, {
+          h:b1[1].h,
+          t:b1[1].h ^ D.OP_MASK,
+          s:snake.index
+        }])
+        snake.head = p2;
+        if(snake.remain > 0){
+          snake.remain--;
+          snake.length++;
+          return;
+        }
+        p1 = snake.tail;
+        b1 = game.getBox(p1);
+        p2 = H.applyDirection(p1, b1[1].h);
+        b2 = game.getBox(p2);
+        snake.tail = p2;
+        game.setBox(p1,[ B.EMPTY, {}]);
+        break;
+      case B.BLOCK:
+      case B.SNAKE:
+        destroySnake(game,snake);
+        break;
+      }
+    })
   },
   join(data,game){
     var {x,y} = data;
@@ -97,17 +111,17 @@ var handlers = {
       name: data.name,
       remain: data.remain,
       tail: {x,y},
+      tick: 1,
       pretty: data.pretty
     };
     game.setSnake(index,snake);
 
     json.snakes[snake.index]=snake;
-    box[0]=B.SNAKE;
-    box[1]={
+    game.setBox({x,y},[ B.SNAKE, {
       h:D.OTHER,
       s:snake.index,
       t:D.OTHER_T,
-    };
+    }]);
   },
   direction(data,game){
     var json = game.json;
@@ -125,10 +139,9 @@ var handlers = {
     if(b1[0] != B.EMPTY){
       throw "box taken";
     }
-    b1[0] = B.FOOD;
-    b1[1] = {
+    game.setBox(data,[ B.FOOD, {
       q: data.q
-    };
+    }]);
   },
   leave(data,game){
     var snake = game.json.snakes[data.s]
@@ -149,9 +162,8 @@ function destroySnake(game,snake){
   var p1 = snake.head;
   var b1 = game.getBox(snake.head);
   while(b1[0] == B.SNAKE && b1[1].s == snake.index){
+    game.setBox(p1,[ B.EMPTY,{}]);
     p1 = H.applyDirection(p1, b1[1].t);
-    b1[0] = B.EMPTY;
-    b1[1] = {};
     b1 = game.getBox(p1);
   }
   game.setSnake(snake.index,null);

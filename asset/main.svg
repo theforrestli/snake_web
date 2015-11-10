@@ -1,0 +1,6 @@
+<svg>
+  <symbol id="empty">
+    <circle cx="0.5" cy="0.5" r="0.5" fill="black" />
+  </symbol>
+  <circle cx="5" cy="5" r="5" fill="black" />
+</svg>

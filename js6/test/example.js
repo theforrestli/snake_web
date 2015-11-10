@@ -1,4 +1,4 @@
-import {D,B,H} from '../consts';
+var {D,B,H} = require('../consts');
 describe("Sample test", () => {
   describe("basics", () => {
     it("is working", () => {

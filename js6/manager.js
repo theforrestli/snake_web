@@ -2,7 +2,7 @@ class Manager{
 
   constructor(){
     this.queue = [];
-    this.listener = undefined;
+    this.listeners = undefined;
   }
   push(value){
     this.queue.push(value);
@@ -16,3 +16,4 @@ class Manager{
     list.forEach(this.listener.handle.bind(this.listener));
   }
 }
+

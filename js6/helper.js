@@ -1,5 +1,5 @@
 
-export function applyDirection({x,y},d){
+exports.applyDirection = function({x,y},d){
   switch(d){
   case D_NORTH: y-=1; break;
   case D_SOUTH: y+=1; break;

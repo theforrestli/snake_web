@@ -1,14 +1,14 @@
 
-export var D_EAST  = 0;
-export var D_SOUTH = 1;
-export var D_WEST  = 2;
-export var D_NORTH = 3;
-export var D_OTHER = 4;
-export var D_OP_MASK = 2;
+var D_EAST  = 0;
+var D_SOUTH = 1;
+var D_WEST  = 2;
+var D_NORTH = 3;
+var D_OTHER = 4;
+var D_OP_MASK = 2;
 
-export var BT_EMPTY = 0;
-export var BT_SNAKE = 1;
-export var D = {
+var BT_EMPTY = 0;
+var BT_SNAKE = 1;
+exports.D = {
   EAST   : 0,
   SOUTH  : 1,
   WEST   : 2,
@@ -17,12 +17,13 @@ export var D = {
   OTHER_T: 6,
   OP_MASK: 2,
 }
-export var B = {
+exports.B = {
   EMPTY: 0,
   SNAKE: 1,
   FOOD : 2,
+  BLOCK: 3,
 }
-export var H = {
+exports.H = {
   applyDirection({x,y},d){
     switch(d){
       case D_NORTH: y-=1; break;
@@ -32,5 +33,8 @@ export var H = {
       default: break;
     }
     return {x,y};
+  },
+  cloneBox(b){
+    return [b[0],$.extend({},b[1])];
   }
 }

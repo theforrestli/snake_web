@@ -1,10 +1,11 @@
 {
   "TODO":[
-    "REST API",
+    "REST API??",
     "better error system",
     "I18n",
     "testing",
     "snake.age",
+    "envify",
     "catch narrower errors",
     {
       "main": "linter",

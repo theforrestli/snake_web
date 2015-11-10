@@ -1,4 +1,4 @@
-import map from '../map';
+var map = require('../map');
 describe("map", () => {
   var input;
   beforeEach(() => {

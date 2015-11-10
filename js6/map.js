@@ -1,9 +1,10 @@
-import * as C from './consts.js';
-export default function(param){
+var {B} = require('./consts');
+
+module.exports = function(param){
   var size=param.width * param.height;
   var grid = [];
   for(var t=0;t<size;t++){
-    grid[t]=[C.BT_EMPTY,{}];
+    grid[t]=[B.EMPTY,{}];
   }
   var game = {
     "version":1,

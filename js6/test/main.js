@@ -1,3 +1,3 @@
-import './example';
-import './map';
-import './game';
+require('./example');
+require( './map');
+require( './game');

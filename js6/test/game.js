@@ -1,6 +1,6 @@
-import {D,B,H} from '../consts';
-import map from '../map';
-import Game from '../game';
+var {D,B,H} = require('../consts');
+var map = require('../map');
+var Game = require('../game');
 function validateGame(game){
 }
 function validateSnake(game,snake,full){
@@ -12,6 +12,7 @@ function validateSnake(game,snake,full){
     'name',
     'pretty',
     'remain',
+    'tick',
     'tail',
   ]);
   expect(snake.head).to.only.have.keys(['x','y']);
@@ -96,11 +97,9 @@ describe("Game", () => {
         d:D.SOUTH,
       }
     ],
-    "m0":[
-      "move",
-      {
-        s:0,
-      }
+    "t0":[
+      "tick",
+      {}
     ],
     "f242":[
       "food",{
@@ -131,13 +130,13 @@ describe("Game", () => {
   describe("#handleCommands", () => {
     describe("join", () => {
       it("initializes snake", () => {
-        var box1 = game.getBox({x:2,y:2});
         game.handleCommands([cmds.j222]);
         expect(game.getSnakeSize()).to.be(1);
         var snake = game.json.snakes[0];
         expect(snake.head).not.to.be(snake.tail);
-        expect(box1[1].t).to.be(D.OTHER_T);
+        var box1 = game.getBox({x:2,y:2});
         expect(box1[1].h).to.be(D.OTHER);
+        expect(box1[1].t).to.be(D.OTHER_T);
       });
       it("can join many snakes", () => {
         var box1 = game.getBox({x:2,y:2});
@@ -190,7 +189,7 @@ describe("Game", () => {
         var snake = game.json.snakes[0];
         snake.remain = 0;
         for(var t=0;t<2;t++){
-          game.handleCommands([cmds.m0]);
+          game.handleCommands([cmds.t0]);
           validateSnake(game,snake);
           expect(snake.length).to.be(1);
         }
@@ -201,7 +200,7 @@ describe("Game", () => {
         snake.remain = 1;
         var lengths = [2,2];
         for(var t=0;t<2;t++){
-          game.handleCommands([cmds.m0]);
+          game.handleCommands([cmds.t0]);
           validateSnake(game,snake);
           expect(snake.length).to.be(lengths[t]);
         }
@@ -212,7 +211,7 @@ describe("Game", () => {
         snake.remain = 2;
         var lengths = [2,3,3];
         for(var t=0;t<3;t++){
-          game.handleCommands([cmds.m0]);
+          game.handleCommands([cmds.t0]);
           validateSnake(game,snake);
           expect(snake.length).to.be(lengths[t]);
         }
@@ -240,8 +239,8 @@ describe("Game", () => {
         snake.remain = 1;
         game.handleCommands([
           cmds.f242,
-          cmds.m0,
-          cmds.m0
+          cmds.t0,
+          cmds.t0
         ]);
         expect(snake.remain).to.be(1);
         expect(snake.length).to.be(3);

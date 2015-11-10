@@ -1,4 +1,4 @@
-export default var B = {
+exports.B = {
   EAST   : 0,
   SOUTH  : 1,
   WEST   : 2,
