@@ -26,7 +26,6 @@
     "client": [
     ],
     "view": [
-      
     ]
   },
   "decisions":[
@@ -72,5 +71,25 @@
   },
   "principles": [
     "command validates everyting before making changes"
-  ]
+  ],
+  "tmp": {
+    "components": {
+      "pubsub": [
+        "game update UI",
+        "network update game",
+        "UI update network",
+      ],
+      "game": [
+        "state of game",
+        "interface to modify game",
+        "publish game updates",
+      ],
+      "UI": [
+        "listens to game updates",
+      ],
+      "network": [
+        "publish game control",
+      ],
+    },
+  }
 }
