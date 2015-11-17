@@ -2,13 +2,11 @@ var gulp = require('gulp');
 var path = require('path');
 var less = require('gulp-less');
 var shell = require('gulp-shell');
-// var babel = require('gulp-babel');
 var mustache = require('gulp-mustache');
 var uncss = require('gulp-uncss');
 var ext_replace=require('gulp-ext-replace');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
-// var browserify = require('gulp-browserify');
 
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
