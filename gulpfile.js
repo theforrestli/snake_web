@@ -25,7 +25,14 @@ var jsConfigs = [
     outDir: "js",
     outFile:"main.js",
     bundler: undefined
-  },{
+  },
+  {
+    inPath: "js6/debug.js",
+    outDir: "js",
+    outFile:"debug.js",
+    bundler: undefined
+  },
+  {
     inPath: "js6/test/main.js",
     outDir: "js/test",
     outFile:"main.js",

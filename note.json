@@ -1,5 +1,6 @@
 {
   "TODO":[
+    "command.js",
     "REST API??",
     "better error system",
     "I18n",

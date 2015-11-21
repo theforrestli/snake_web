@@ -1,4 +1,4 @@
-import {B} from './constcirclecirclecircles';
+var {B} = require('./consts');
 //view listens game
 export default class View{
   constructor(id,game){
@@ -35,7 +35,7 @@ export default class View{
     case B.EMPTY:break;
     case B.SNAKE:
       var rect = vbox.rect(1,1);
-      circle.fill({color:"#000"});
+      rect.fill({color:"#000"});
       break;
     case B.FOOD:
       var circle = vbox.circle(1);
