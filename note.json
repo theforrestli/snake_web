@@ -92,5 +92,14 @@
         "publish game control",
       ],
     },
-  }
+  },
+  "server": [
+    "socket.io only handles communication with channel",
+    ":api/:room",
+    "able to tell who to send it to",
+    {
+      "to_server": ["m",[":channel",":data"]],
+      "to_client": [":channel",[":uuid",":data"]],
+    }
+  ]
 }
