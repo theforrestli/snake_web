@@ -13,7 +13,7 @@
   if (typeof define === 'function' && define.amd) {
     define(factory);
   } else if (typeof exports === 'object') {
-    module.exports = factory.apply(root, require, exports, module);
+    module.exports = factory.apply({}, require, exports, module);
   } else {
     root.SVG = factory();
   }

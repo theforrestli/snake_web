@@ -11,7 +11,7 @@ var param = {
   version: 1,
 }
 var game = new Game(map(param).game);
-var view = new View("main",game);
+var view = new View($("#main")[0],game);
 var {D,B,H} = require('./consts.js');
 window.cmds = {
   "j222":[

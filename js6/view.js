@@ -1,8 +1,9 @@
 var {B} = require('./consts');
+var SVG = require('../vendor/svg.js');
 //view listens game
 export default class View{
-  constructor(id,game){
-    this.svg=SVG(id);
+  constructor(el,game){
+    this.svg=SVG(el);
     this.main = this.svg.group();
     this.main.scale(10);
     this.game=game;

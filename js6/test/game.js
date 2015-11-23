@@ -124,7 +124,7 @@ describe("Game", () => {
       width: 20,
       height: 20,
       version: 1,
-    }
+    };
     game = new Game(map(param).game);
   });
   describe("#handleCommands", () => {
