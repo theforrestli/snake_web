@@ -1,0 +1,17 @@
+{
+  "name": "snake_web",
+  "version": "0.0.0",
+  "homepage": "https://github.com/lijiaqigreat/snake_web",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "jquery": "~2.1.4",
+    "svg.js": "~2.2.1"
+  }
+}

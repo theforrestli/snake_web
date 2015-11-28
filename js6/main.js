@@ -2,9 +2,10 @@
 // window.pubsub = require('../vendor/pubsub.js')
 // console.log("2π = " + math.sum(math.pi, math.pi));
 // var a = require('./test2');
-var View = require('./view.js');
-var Game = require('./game.js');
-var map = require('./map');
+var tmpp = require('test');
+var View = require('view');
+var Game = require('game');
+var map = require('map');
 var param = {
   width: 20,
   height: 20,

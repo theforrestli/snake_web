@@ -1,6 +1,6 @@
-var {D,B,H} = require('../consts');
-var map = require('../map');
-var Game = require('../game');
+var {D,B,H} = require('consts');
+var map = require('map');
+var Game = require('game');
 function validateGame(game){
 }
 function validateSnake(game,snake,full){

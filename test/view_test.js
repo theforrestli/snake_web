@@ -1,6 +1,6 @@
-var View = require('../view');
-var Game = require('../game');
-var map = require('../map');
+var View = require('view');
+var Game = require('game');
+var map = require('map');
 describe("View", () => {
   describe("on game box", () => {
     it("clears the original content", () => {

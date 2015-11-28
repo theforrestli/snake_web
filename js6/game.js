@@ -1,4 +1,4 @@
-var {D,B,H} = require('./consts');
+var {D,B,H} = require('consts');
 var {EventEmitter} = require('events');
 module.exports = class Game extends EventEmitter{
   constructor(json){

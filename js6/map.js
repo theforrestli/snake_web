@@ -1,4 +1,4 @@
-var {B} = require('./consts');
+var {B} = require('consts');
 
 module.exports = function(param){
   var size=param.width * param.height;

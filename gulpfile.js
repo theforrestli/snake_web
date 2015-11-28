@@ -19,36 +19,6 @@ var gutil = require('gulp-util');
 var browserSync = require("browser-sync").create();
 var reload=browserSync.reload;
 
-var jsConfigs = [
-  {
-    inPath: "js6/main.js",
-    outDir: "js",
-    outFile:"main.js",
-    bundler: undefined
-  },
-  {
-    inPath: "js6/debug.js",
-    outDir: "js",
-    outFile:"debug.js",
-    bundler: undefined
-  },
-  {
-    inPath: "js6/test/main.js",
-    outDir: "js/test",
-    outFile:"main.js",
-    bundler: undefined
-  }
-]
-function rebundle(cfg){
-  cfg.bundler.bundle()
-    .on('error', swallowError)
-    .pipe(source(cfg.outFile))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({ loadMaps: true }))
-    .pipe(sourcemaps.write('./'))
-    .pipe(gulp.dest(cfg.outDir));
-}
-
 gulp.task('shrinkwrap', shell.task('npm shrinkwrap'));
 
 gulp.task('less', function () { return gulp.src('./less/main.less')
@@ -67,10 +37,47 @@ gulp.task('html',function(){ return gulp.src('./*.mustache')
   .pipe(gulp.dest("./"));
 });
 
+var jsConfigs = [
+  {
+    inPath: "js6/main.js",
+    outDir: "js",
+    outFile:"main.js",
+    bundler: undefined
+  },
+  {
+    inPath: "js6/debug.js",
+    outDir: "js",
+    outFile:"debug.js",
+    bundler: undefined
+  },
+  {
+    inPath: "test/main.js",
+    outDir: "js",
+    outFile:"test.js",
+    bundler: undefined
+  }
+]
+
 gulp.task('js', function(){
+  function rebundle(cfg){
+    cfg.bundler.bundle()
+      .on('error', swallowError)
+      .pipe(source(cfg.outFile))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(cfg.outDir));
+  }
+
   jsConfigs.forEach(function(cfg){
     if(cfg.bundler == null){
-      cfg.bundler = watchify(browserify(cfg.inPath, { debug: true }).transform(babel));
+      cfg.bundler = watchify(browserify(cfg.inPath, {
+        debug: true,
+        paths: ["js6","vendor"],
+      }).transform(babel, {
+        compact: false,
+        only: ["js6/*.js","test/**/*.js"]
+      }));
     }
     rebundle(cfg);
   });
