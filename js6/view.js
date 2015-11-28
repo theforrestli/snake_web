@@ -1,5 +1,5 @@
 var {B} = require('consts');
-var SVG = require('svg');
+var SVG = require('svg.js/svg');
 //view listens game
 export default class View{
   constructor(el,game){

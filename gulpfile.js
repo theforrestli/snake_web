@@ -73,7 +73,7 @@ gulp.task('js', function(){
     if(cfg.bundler == null){
       cfg.bundler = watchify(browserify(cfg.inPath, {
         debug: true,
-        paths: ["js6","vendor"],
+        paths: ["js6","libs"],
       }).transform(babel, {
         compact: false,
         only: ["js6/*.js","test/**/*.js"]

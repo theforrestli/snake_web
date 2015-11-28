@@ -3,7 +3,7 @@ module.exports.sum =  function sum(a,b){
   return a+b;
 }
 exports.pi=3.14;
-var SVG = require('../bower_components/svg.js/dist/svg.js');
+var SVG = require('svg.js/svg');
 console.log("!!!");
 console.log(SVG);
 // var svg=SVG("main");
