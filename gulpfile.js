@@ -1,5 +1,8 @@
-var gulp = require('gulp');
 var path = require('path');
+var exec = require('child_process').exec;
+
+var gulp = require('gulp');
+var gutil = require('gulp-util');
 var less = require('gulp-less');
 var shell = require('gulp-shell');
 var mustache = require('gulp-mustache');
@@ -10,11 +13,11 @@ var uglify = require('gulp-uglify');
 
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
+
 var browserify = require('browserify');
 var watchify = require('watchify');
 var babel = require('babelify');
 
-var gutil = require('gulp-util');
 
 var browserSync = require("browser-sync").create();
 var reload=browserSync.reload;
@@ -76,7 +79,7 @@ gulp.task('js', function(){
         paths: ["js6","libs"],
       }).transform(babel, {
         compact: false,
-        only: ["js6/*.js","test/**/*.js"]
+        only: ["js6/*.js","test/*.js"]
       }));
     }
     rebundle(cfg);
@@ -109,7 +112,7 @@ gulp.task('serve', ['build'], function () {
   });
   gulp.watch(['css/**/*.less'],['less',reload]);
   gulp.watch(['index.mustache','partials/**'], ['html',reload]);
-  gulp.watch(['js6/**/*.js'],['js',reload]);
+  gulp.watch(['js6/**/*.js', 'test/**/*.js'],['js', reload]);
 });
 
 function swallowError (error) {
