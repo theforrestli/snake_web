@@ -1,4 +1,8 @@
-exports.B = {
+var {B,D} = require('consts')
+var Box = {
+
+}
+var Box = exports.modules = {
   EAST   : 0,
   SOUTH  : 1,
   WEST   : 2,
@@ -7,14 +11,26 @@ exports.B = {
   OTHER_T: 6,
   OP_MASK: 2,
 
-  setTD(box,type,data){
-    box[0] = type;
-    box[1] = data;
+  proto: {
+    getType(){
+      return this[0];
+    },
+    getData(){
+      return this[1];
+    },
   },
-  getT(box){
-    return box[0];
-  },
-  getD(box){
-    return box[1];
+  g: {
+    empty(){
+      return [B.EMPTY,{}];
+    },
+    snake(headDirection=D.OTHER, tailDirection=D.OTHER_T){
+      return [B.SNAKE,{h:headDirection, t:tailDirection}]
+    },
+    food(quantity){
+      return [B.FOOD, {q: quantity}]
+    },
+    block(){
+      return [B.BLOCK, {}]
+    }
   }
 };

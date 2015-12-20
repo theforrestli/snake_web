@@ -1,44 +1,90 @@
 var socket_io = require('socket.io');
+var _ = require("underscore");
 var prefix = "/";
-var gen = function(json,id){
-  var io = socket_io(id);
-  var game = new Game(json);
-  io.on("connection",(socket) => {
-    socket.emit("init", game.json);
-    socket.on("reload",(message) =>{
-      socket.emit("init", game.json);
-    });
-    socket.on("game", (message) => {
-      io.emit("game", message);
-    });
-  });
-  var tick = setInterval(game.tick,function(){
-    io.emit("game",[["tick"]]);
-  });
-
-  return {
-    io,
-    game,
-    tick
-  }
-};
-var message_valid = () => true;
 
 var io = socket_io();
+var idMap = new Map();
+var initData = {
+  data: {},
+  command_on_leave: ["l"],
+  random_length: 128,
+  name: "",
+}
+createNamespace(io);
+function createNamespace(nsp){
+  var history = [];
+  nsp.on("connection",(socket) => {
+    debugger;
 
-io.on("connection",(socket) => {
-  console.log(`connected: ${socket.id}`);
-  socket.join("default");
-  global.socket=socket;
-  socket.on("m",(m) => {
-    console.log("m");
-    console.log(m);
-    if(!message_valid(m)){
-      return;
+    console.log(`connected: ${socket.id}`);
+    socket.join("default");
+    global.socket=socket;
+    setupDebugger(nsp, socket);
+    function setupDebugger(nsp, socket){
+      socket.on("test",(m) => {
+        console.log("test", m);
+        socket.to("default").emit("test", {
+          "socket_id": socket.id,
+          "socket": socket,
+          "data": m
+        });
+      });
+      socket.on("connect", (data) => {
+        console.log("nooo");
+        console.log("NEVER: connected!", socket);
+      });
+      socket.on("reconnect", (data) => {
+        console.log("nooo");
+        console.log("NEVER: reconnected", socket);
+      });
     }
-    socket.to("default").emit(m[0],[socket.id,m[1]])
-  })
-})
+    socket.on("s", (ids) => {
+      const index = _.findIndex(ids, (id) => {
+        return ValidateId(id) && !idMap.has(id);
+      });
+      if(index === -1){
+        return socket.emit("s", socket.user_id);
+      }else{
+        if(socket.user_id !== undefined){
+          leave();
+        }
+        const id = ids[index];
+        join(id);
+        return socket.emit("s", socket.user_id);
+      }
+      function ValidateId(id){
+        return _.isString(id) && id.length < 256;
+      }
+    });
+    socket.on("b", (data) => {
+      console.log("b",data);
+      broadcast(data);
+    });
+    socket.on("disconnect", (data) => {
+      leave();
+      console.log("disconnect", data);
+    });
+    socket.on("g", (data) => {
+    });
+    function broadcast(data){
+      const command = [socket.user_id, data]
+      history.push(command);
+      nsp.to("all", command);
+    }
+    function join(id){
+      idMap.set(id,socket);
+      socket.user_id = id;
+      socket.join("all");
+    }
+    function leave(){
+      broadcast(initData.command_on_leave);
+      idMap.delete(socket.user_id);
+      delete socket.user_id;
+      socket.leave("all");
+    }
+  });
+}
+
 
 io.listen(3002);
 

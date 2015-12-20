@@ -1,20 +1,22 @@
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
-* @version 2.2.1
+* @version 2.2.4
 * http://www.svgjs.com
 *
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Wed Nov 18 2015 14:42:33 GMT+0100 (Mitteleuropäische Zeit)
+* BUILT: Sat Dec 12 2015 00:53:00 GMT+0100 (Mitteleuropäische Zeit)
 */;
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define(factory);
+    define(function(){
+      return factory(root, root.document)
+    })
   } else if (typeof exports === 'object') {
-    module.exports = root.document ? factory(root, root.document) : function(w){ return factory(w, w.document) };
+    module.exports = root.document ? factory(root, root.document) : function(w){ return factory(w, w.document) }
   } else {
-    root.SVG = factory(root, root.document);
+    root.SVG = factory(root, root.document)
   }
 }(typeof window !== "undefined" ? window : this, function(window, document) {
 
@@ -694,6 +696,16 @@ SVG.extend(SVG.PathArray, {
         .trim()                                 // trim
         .split(SVG.regex.whitespaces)           // split into array
 
+      // at this place there could be parts like ['3.124.854.32'] because we could not determine the point as seperator till now
+      // we fix this elements in the next loop
+      for(i = array.length; --i;){
+        if(array[i].indexOf('.') != array[i].lastIndexOf('.')){
+          var split = array[i].split('.') // split at the point
+          var first = [split.shift(), split.shift()].join('.') // join the first number together
+          array.splice.apply(array, [i, 1].concat(first, split.map(function(el){ return '.'+el }))) // add first and all other entries back to array
+        }
+      }
+
     }else{
       array = array.reduce(function(prev, curr){
         return [].concat.apply(prev, curr)
@@ -711,8 +723,10 @@ SVG.extend(SVG.PathArray, {
         s = array[0]
         array.shift()
       // If last letter was a move command and we got no new, it defaults to [L]ine
-      }else if(s.toUpperCase() == 'M'){
+      }else if(s == 'M'){
         s = 'L'
+      }else if(s == 'm'){
+        s = 'l'
       }
 
       // add path letter as first element
@@ -1812,8 +1826,8 @@ SVG.RBox = SVG.invent({
     fullBox(this)
 
     // offset by window scroll position, because getBoundingClientRect changes when window is scrolled
-    this.x += window.scrollX
-    this.y += window.scrollY
+    this.x += window.pageXOffset
+    this.y += window.pageYOffset
   }
 
   // define Parent
@@ -1892,6 +1906,12 @@ SVG.Matrix = SVG.invent({
       , scaleY:   Math.sqrt(this.c * this.c + this.d * this.d)
         // rotation
       , rotation: skewX
+      , a: this.a
+      , b: this.b
+      , c: this.c
+      , d: this.d
+      , e: this.e
+      , f: this.f
       }
     }
     // Clone matrix
@@ -2757,7 +2777,7 @@ SVG.Mask = SVG.invent({
       for (var i = this.targets.length - 1; i >= 0; i--)
         if (this.targets[i])
           this.targets[i].unmask()
-      delete this.targets
+      this.targets = []
 
       // remove mask from parent
       this.parent().removeElement(this)
@@ -2816,7 +2836,7 @@ SVG.ClipPath = SVG.invent({
       for (var i = this.targets.length - 1; i >= 0; i--)
         if (this.targets[i])
           this.targets[i].unclip()
-      delete this.targets
+      this.targets = []
 
       // remove clipPath from parent
       this.parent().removeElement(this)
@@ -3485,6 +3505,8 @@ SVG.Image = SVG.invent({
       img.onload = function() {
         var p = self.parent(SVG.Pattern)
 
+        if(p === null) return
+
         // ensure image size
         if (self.width() == 0 && self.height() == 0)
           self.size(img.width, img.height)
@@ -3652,13 +3674,20 @@ SVG.Text = SVG.invent({
       // define position of all lines
       if (this._rebuild) {
         var self = this
+          , blankLineOffset = 0
+          , dy = this.dom.leading * new SVG.Number(this.attr('font-size'))
 
         this.lines().each(function() {
           if (this.dom.newLined) {
             if (!this.textPath)
               this.attr('x', self.attr('x'))
 
-            this.attr('dy', self.dom.leading * new SVG.Number(self.attr('font-size')))
+            if(this.text() == '\n') {
+              blankLineOffset += dy
+            }else{
+              this.attr('dy', dy + blankLineOffset)
+              blankLineOffset = 0
+            }
           }
         })
 
@@ -3705,6 +3734,8 @@ SVG.Tspan = SVG.invent({
 , extend: {
     // Set text content
     text: function(text) {
+      if(text == null) return this.node.textContent + (this.dom.newLined ? '\n' : '')
+
       typeof text === 'function' ? text.call(this, this) : this.plain(text)
 
       return this

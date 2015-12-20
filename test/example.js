@@ -1,4 +1,5 @@
 var {D,B,H} = require('consts');
+var _ = require('underscore/underscore');
 describe("Sample test", () => {
   describe("basics", () => {
     it("is working", () => {
@@ -7,6 +8,9 @@ describe("Sample test", () => {
     it("can import", () => {
       expect(D.EAST).not.to.be(undefined);
     });
+    it("instance", () => {
+      expect([]).to.be.an('array');
+    })
   });
   describe("hooks", () =>{
     var a=0;
@@ -19,6 +23,6 @@ describe("Sample test", () => {
     it("run before block twice", () => {
       expect(a).to.be(1);
     })
-  })
+  });
 });
 

@@ -1,48 +1,77 @@
 var {D,B,H} = require('consts');
-var {EventEmitter} = require('events');
-module.exports = class Game extends EventEmitter{
-  constructor(json){
-    super();
-    if(json.version != 1)
-      throw "wrong version";
-    this.json = json;
-    var nsnake = this.json.snakes
-      .filter(x => x != null)
-      .length;
-    this.cache = {
-      nsnake,
+var Game;
+module.exports = Game = {
+  proto: {
+    _$nextRandom(max){
+      const me = this.seed;
+      const t = me.x ^ (me.x << 11);
+      me.x = me.y;
+      me.y = me.z;
+      me.z = me.w;
+      const result = (me.w ^= (me.w >>> 19) ^ t ^ (t >>> 8));
+      return (((result/0x100000000)+0.5)*max)|0;
+    },
+    _$nextFreeP(){
+      var iGrid;
+      var box;
+      do{
+        iGrid = this._$nextRandom(this.grid.length);
+        box = this.grid[iGrid];
+      }while(Box.getType(box) != Box.EMPTY)
+      return this.toPosition(iGrid);
+    },
+    $join(index, listeners){
+      // return (game, listeners){
+      //   if(game.snakes[index] == null){
+      //     return listeners.log(1, `the snake spot ${index} has been taken`)
+      //   }
+      //   const {x,y} = game._$nextFreeP();
+      //   const box = game.getBox({x,y});
+
+      //   var snake={
+      //     age: 0,
+      //     head: {x,y},
+      //     length: 1,
+      //     name: `Snake-${index}`,
+      //     remain: game.config.remain,
+      //     tail: {x,y},
+      //     tick: 1,
+      //     pretty: {},
+      //   };
+      //   game.snakes[index]=snake;
+      //   game.setBox({x,y},[ B.SNAKE, {
+      //     h:D.OTHER,
+      //     s:snake.index,
+      //     t:D.OTHER_T,
+      //   }], listeners);
+      // };
+    },
+    tick(game){
+    },
+  },
+  generate({width = 100, height = 100, snakeCount = 10, config = {}}){
+    const length = width * height;
+    const game = {
+      config: {},
+      grid: new Array(length),
+      height,
+      seed: {
+        x: random32(),
+        y: random32(),
+        z: random32(),
+        w: random32(),
+      },
+      snakes: [],
+      tick: 0,
+      version: 1,
+      width
     };
-  }
-  handleCommands(cmds){
-    cmds.forEach((cmd) => {
-      try{
-        handlers[cmd[0]](cmd[1],this);
-      }catch(e){
-        console.error(e);
-      }
-    });
-  }
-  getBox({x,y}){
-    var index = y*this.json.width+x;
-    return this.json.grid[index];
-  }
-  getSnakeSize(){
-    return this.cache.nsnake;
-  }
-  setSnake(index,snake){
-    if(this.json.snakes[index] != null){
-      this.cache.nsnake--;
+
+    function random32(){
+      return (Math.random()*0x100000000)|0;
     }
-    if(snake != null){
-      this.cache.nsnake++;
-    }
-    this.json.snakes[index]=snake;
-  }
-  setBox({x,y},b2){
-    var index = y*this.json.width+x;
-    var b1 = this.json.grid[index];
-    this.json.grid[index] = b2;
-    this.emit("box",{x,y},b1,b2);
+    
+    return game;
   }
 }
 var handlers = {
@@ -117,11 +146,11 @@ var handlers = {
     game.setSnake(index,snake);
 
     json.snakes[snake.index]=snake;
-    game.setBox({x,y},[ B.SNAKE, {
+    game.$setBox({x,y},[ B.SNAKE, {
       h:D.OTHER,
       s:snake.index,
       t:D.OTHER_T,
-    }]);
+    }], listeners);
   },
   direction(data,game){
     var json = game.json;

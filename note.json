@@ -93,13 +93,26 @@
       ],
     },
   },
-  "server": [
+  "server": {
     "socket.io only handles communication with channel",
     ":api/:room",
     "able to tell who to send it to",
+    "in_game_command": {
+      "tick": ["server", ":n", ":random_seed"],
+      "forward": [":from_user_id", ":data"],
+    },
+    "server_command": {
+      "join": [":user_id"],
+    },
     {
-      "to_server": ["m",[":channel",":data"]],
-      "to_client": [":channel",[":uuid",":data"]],
+      "init_data": "",
+      "command_on_leave": [
+        "everyone who leave must send a command",
+        "users can send leave command without leaving",
+      ]
+    },
+    "server_query": {
+      "join": [":possible_user_ids"],
     }
-  ]
+  },
 }

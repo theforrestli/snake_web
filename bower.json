@@ -15,7 +15,9 @@
     "svg.js": "~2.2.1",
     "PubSub": "pubsub#~1.0.0",
     "mocha": "~2.3.4",
-    "expect": "~0.3.1"
+    "expect": "~0.3.1",
+    "underscore": "~1.8.3",
+    "socket.io-client": "~1.3.7"
   },
   "install": {
     "path": "libs",
@@ -26,6 +28,9 @@
       ],
       "expect": [
         "bower_components/expect/index.js"
+      ],
+      "socket.io-client": [
+        "bower_components/socket.io-client/socket.io.js"
       ]
     }
   }

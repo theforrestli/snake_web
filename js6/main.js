@@ -6,13 +6,15 @@ var tmpp = require('test');
 var View = require('view');
 var Game = require('game');
 var map = require('map');
+var _ = require('underscore/underscore');
+var io = require('socket.io-client/socket.io');
 var param = {
   width: 20,
   height: 20,
   version: 1,
 }
-var game = new Game(map(param).game);
-var view = new View($("#main")[0],game);
+// var game = new Game(map(param).game);
+// var view = new View($("#main")[0],game);
 var {D,B,H} = require('./consts.js');
 window.cmds = {
   "j222":[
@@ -77,8 +79,10 @@ window.cmds = {
   ]
 }
 
-window.game = game;
-window.view = view;
+// window.game = game;
+// window.view = view;
+window.io = io;
+window._ = _;
 
 
 // import Game from './game';
