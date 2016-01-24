@@ -1,11 +1,8 @@
-
-exports.applyDirection = function({x,y},d){
-  switch(d){
-  case D_NORTH: y-=1; break;
-  case D_SOUTH: y+=1; break;
-  case D_WEST: x-=1; break;
-  case D_EAST: x+=1; break;
-  default: break;
+module.exports = {
+  get(object, key){
+    (!_.contains(Object.keys(object), key)){
+      return undefined;
+    }
+    return object[key];
   }
-  return {x,y};
-}
+};

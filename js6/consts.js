@@ -1,13 +1,3 @@
-
-var D_EAST  = 0;
-var D_SOUTH = 1;
-var D_WEST  = 2;
-var D_NORTH = 3;
-var D_OTHER = 4;
-var D_OP_MASK = 2;
-
-var BT_EMPTY = 0;
-var BT_SNAKE = 1;
 exports.D = {
   EAST   : 0,
   SOUTH  : 1,
@@ -16,6 +6,9 @@ exports.D = {
   OTHER  : 4,
   OTHER_T: 6,
   OP_MASK: 2,
+  isValidUserDirection(d){
+    return 0<=d && d<4;
+  }
 }
 exports.B = {
   EMPTY: 0,
@@ -37,4 +30,12 @@ exports.H = {
   cloneBox(b){
     return [b[0],$.extend({},b[1])];
   }
+}
+exports.LOG = {
+  TRACE: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  ERROR: 4,
+  FATAL: 5,
 }

@@ -42,9 +42,23 @@
         "each box have independent animation",
         "easy to update"
       ]
+    },
+    {
+      "claim": "",
     }
   ],
   "interface":{
+    "game command": {
+      "format": "[:from, :data]",
+      "from": "id for user or \"s\" for server",
+      "data": {
+        
+      }
+    },
+    "game": {
+
+    },
+    "
     "description": "only in game commands",
     "exclude":[
       "chat",
@@ -73,6 +87,11 @@
   "principles": [
     "command validates everyting before making changes"
   ],
+  "listeners": {
+    "updateBox": {
+      "parameter": "p, oldBox, newBox",
+    },
+  },
   "tmp": {
     "components": {
       "pubsub": [

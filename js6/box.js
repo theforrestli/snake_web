@@ -1,16 +1,6 @@
 var {B,D} = require('consts')
-var Box = {
-
-}
-var Box = exports.modules = {
-  EAST   : 0,
-  SOUTH  : 1,
-  WEST   : 2,
-  NORTH  : 3,
-  OTHER  : 4,
-  OTHER_T: 6,
-  OP_MASK: 2,
-
+var Box = {}
+var Box = module.exports = {
   proto: {
     getType(){
       return this[0];
@@ -19,12 +9,12 @@ var Box = exports.modules = {
       return this[1];
     },
   },
-  g: {
+  generate: {
     empty(){
       return [B.EMPTY,{}];
     },
-    snake(headDirection=D.OTHER, tailDirection=D.OTHER_T){
-      return [B.SNAKE,{h:headDirection, t:tailDirection}]
+    snake(snakeId, headDirection=D.OTHER, tailDirection=D.OTHER_T){
+      return [B.SNAKE,{h:headDirection, s:snakeId, t:tailDirection}]
     },
     food(quantity){
       return [B.FOOD, {q: quantity}]
@@ -32,5 +22,5 @@ var Box = exports.modules = {
     block(){
       return [B.BLOCK, {}]
     }
-  }
+  },
 };

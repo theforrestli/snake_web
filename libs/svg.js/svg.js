@@ -6,7 +6,7 @@
 * @copyright Wout Fierens <wout@impinc.co.uk>
 * @license MIT
 *
-* BUILT: Sat Dec 12 2015 00:53:00 GMT+0100 (Mitteleuropäische Zeit)
+* BUILT: Tue Dec 29 2015 13:14:32 GMT+0100 (Mitteleuropäische Zeit)
 */;
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
@@ -112,6 +112,9 @@ SVG.invent = function(config) {
 
 // Adopt existing svg elements
 SVG.adopt = function(node) {
+  // check for presence of node
+  if (!node) return null
+
   // make sure a node isn't already adopted
   if (node.instance) return node.instance
 
@@ -2258,7 +2261,7 @@ SVG.extend(SVG.Element, {
   untransform: function() {
     return this.attr('transform', null)
   },
-  // merge the whole transformation chain into one matrix
+  // merge the whole transformation chain into one matrix and returns it
   matrixify: function() {
 
     var matrix = (this.attr('transform') || '')
@@ -2275,8 +2278,6 @@ SVG.extend(SVG.Element, {
         return matrix[transform[0]].apply(matrix, transform[1])
 
       }, new SVG.Matrix())
-    // apply calculated matrix to element
-    this.attr('transform', matrix)
 
     return matrix
   },
@@ -2633,11 +2634,11 @@ SVG.G = SVG.invent({
 , extend: {
     // Move over x-axis
     x: function(x) {
-      return x == null ? this.transform('x') : this.transform({ x: -this.x() + x }, true)
+      return x == null ? this.transform('x') : this.transform({ x: x - this.x() }, true)
     }
     // Move over y-axis
   , y: function(y) {
-      return y == null ? this.transform('y') : this.transform({ y: -this.y() + y }, true)
+      return y == null ? this.transform('y') : this.transform({ y: y - this.y() }, true)
     }
     // Move by center over x-axis
   , cx: function(x) {
@@ -2672,6 +2673,7 @@ SVG.G = SVG.invent({
     }
   }
 })
+
 // ### This module adds backward / forward functionality to elements.
 
 //

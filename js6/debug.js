@@ -1,5 +1,4 @@
 var math = require('test');
-window.pubsub = require('PubSub/pubsub')
 console.log("2π = " + math.sum(math.pi, math.pi));
 var a = require('test2');
 // import View from './view';

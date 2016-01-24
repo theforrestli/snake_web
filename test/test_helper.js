@@ -1,3 +1,4 @@
+const _ = require("underscore");
 
 module.exports = {
   validateNonNegativeInteger(value){
@@ -5,7 +6,7 @@ module.exports = {
     expect(value).to.eql(Math.floor(value));
   },
   when(v, k, cases){
-    expect(_.keys(cases)).to.contain(v);
+    expect(_.keys(cases)).to.contain(v.toString());
     cases[v](k);
   },
   validateKVPair(pair, cases){
