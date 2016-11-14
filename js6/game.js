@@ -3,7 +3,7 @@ const Box = require('box');
 const xor128 = require('seedrandom/xor128');
 const _ = require('underscore/underscore');
 const helpers = function(state, listeners){
-  return self = {
+  const self = {
     _$nextRandom(max){
       const me = this.seed;
       const t = me.x ^ (me.x << 11);
@@ -19,18 +19,18 @@ const helpers = function(state, listeners){
       do{
         iGrid = this._$nextRandom(this.grid.length);
         box = this.grid[iGrid];
-      }while(Box.getType(box) != Box.EMPTY)
+      }while(Box.getType(box) != Box.EMPTY);
       return this.toPosition(iGrid);
     },
-  }
-}
+  };
+  return self;
+};
 // module.exports = {
 //   generate,
 //   helpers,
 // };
 var Game;
 module.exports = Game = {
-
   proto: {
     nextFreeP(random = this.getRandom()){
       var iGrid;
@@ -38,7 +38,7 @@ module.exports = Game = {
       do{
         iGrid = (random()*this.grid.length)|0;
         box = this.grid[iGrid];
-      }while(box[0] != B.EMPTY)
+      }while(box[0] != B.EMPTY);
       return this.toPosition(iGrid);
     },
     getRandom(){
@@ -51,7 +51,7 @@ module.exports = Game = {
       if(0<=p.x && p.x<this.width && 0<=p.y && p.y<this.height){
         return this.grid[p.x+p.y*this.height];
       }else{
-        return null;
+        return undefined;
       }
     },
     _$setBox(p, newBox){
@@ -60,7 +60,7 @@ module.exports = Game = {
       this.grid[iGrid] = newBox;
     },
     $join(index){
-      if(this.snakes[index] != null){
+      if(this.snakes[index] !== undefined){
         //TODO return listeners;
         return;
       }
@@ -103,20 +103,21 @@ module.exports = Game = {
       const seedrandom = new xor128(seed, {state: true});
       const self = this;
       _.each(this.snakes,(snake, index) => {
-        if(snake == null){
+        if(snake === undefined){
           return;
         }
-        if(snake.powerStopAge <= self.tick && (self.tick|1)!=0){
+        if(snake.powerStopAge <= self.tick && (self.tick|1) !== 0){
           return;
         }
 
         const headP = snake.head;
         const headB = this.getBox(headP);
-        const nextP = this._applyDirection(headP, headB[1].h)
+        const nextP = this._applyDirection(headP, headB[1].h);
         const nextB = this.getBox(nextP);
         switch(nextB[0]){
           case B.FOOD:
             snake.remain += nextB[1].q;
+            /* falls through */
           case B.EMPTY:
             _$move(index);
             break;
@@ -133,12 +134,12 @@ module.exports = Game = {
       {
         const headP = snake.head;
         const headB = this.getBox(headP);
-        const newP = this._applyDirection(headP, headB[1].h)
+        const newP = this._applyDirection(headP, headB[1].h);
 
         this._$setBox(newP, Box.generate.snake(
           index,
           headB[1].h,
-          headB[1].h ^ D.OP_MASK,
+          headB[1].h ^ D.OP_MASK
         ));
         snake.head = newP;
       }
@@ -169,13 +170,13 @@ module.exports = Game = {
       if(0<=x && x<this.width && 0<=y && y<this.height){
         return {x,y};
       }
-      return null;
+      return undefined;
     },
     toPosition(i){
       return {
         x: i%this.width,
         y: (i/this.width)|0
-      }
+      };
     },
     $$(command){
       const data = command[1];
@@ -219,8 +220,7 @@ module.exports = Game = {
     function random32(){
       return (Math.random()*0x100000000)|0;
     }
-    game.__proto__ = Game.proto;
-    return game;
+    return Object.create(Game.proto, game);
   },
 };
 var handlers = {
@@ -244,13 +244,14 @@ var handlers = {
       switch(b2[0]){
       case B.FOOD:
         snake.remain += b2[1].q;
-        game.setBox(p2,[ B.EMPTY, {} ])
+        game.setBox(p2,[ B.EMPTY, {} ]);
+        /* falls through */
       case B.EMPTY:
         game.setBox(p2,[ B.SNAKE, {
           h:b1[1].h,
           t:b1[1].h ^ D.OP_MASK,
           s:snake.index
-        }])
+        }]);
         snake.head = p2;
         if(snake.remain > 0){
           snake.remain--;
@@ -269,7 +270,7 @@ var handlers = {
         destroySnake(game,snake);
         break;
       }
-    })
+    });
   },
   join(data,game){
     var {x,y} = data;
@@ -322,13 +323,13 @@ var handlers = {
     }]);
   },
   leave(data,game){
-    var snake = game.json.snakes[data.s]
-    if(snake == null){
+    var snake = game.json.snakes[data.s];
+    if(snake === undefined){
       throw "snake not exist";
     }
     destroySnake(game,snake);
   }
-}
+};
 function destroySnake(game,snake){
   var p1 = snake.head;
   var b1 = game.getBox(snake.head);
@@ -337,5 +338,5 @@ function destroySnake(game,snake){
     p1 = H.applyDirection(p1, b1[1].t);
     b1 = game.getBox(p1);
   }
-  game.setSnake(snake.index,null);
+  game.setSnake(snake.index,undefined);
 }

@@ -9,7 +9,7 @@ describe("View", () => {
         height: 20,
         version: 1,
       };
-      var game = new Game(map(param).game);
+      var game = Object.create(game.proto, map(param));
       var svgEl = $('<svg></svg>')[0];
       var view = new View(svgEl, game);
       var box = view.grid[20];

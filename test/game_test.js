@@ -18,7 +18,7 @@ function validateGame(game){
     'width',
   ]);
 
-  validateConfig(game.config)
+  validateConfig(game.config);
 
   expect(game.grid).to.be.an('array');
   expect(game.grid).to.have.length(game.width * game.height);
@@ -26,7 +26,7 @@ function validateGame(game){
     validateBox(box, {x: index%game.width, y: (index/game.width)|0});
   });
 
-  th.validateNonNegativeInteger(game.height)
+  th.validateNonNegativeInteger(game.height);
 
   validateSeed(game.seed);
 
@@ -39,7 +39,7 @@ function validateGame(game){
 
   th.validateNonNegativeInteger(game.tick);
   expect(game.version).to.be(1);
-  th.validateNonNegativeInteger(game.width)
+  th.validateNonNegativeInteger(game.width);
 
   function validateConfig(config){
     expect(config).to.only.have.keys([
@@ -49,7 +49,7 @@ function validateGame(game){
   }
 
   function validateSnake(snake, index, count){
-    if(snake == null){
+    if(snake === undefined){
       return;
     }
     expect(snake).to.only.have.keys([
@@ -204,7 +204,7 @@ function validateGame(game){
   }
 
   function validateSeed(seed){//state of xor128
-    const keys = ["x","y","z","w"]
+    const keys = ["x","y","z","w"];
     expect(seed).to.only.have.keys(keys);
     keys.forEach((k) => {
       expect(seed[k]).to.be.a('number');
@@ -219,7 +219,7 @@ function validateGame(game){
         count[b[1].s]|=0;
         count[b[1].s]+=1;
       }
-    })
+    });
     console.log(new Date() - time);
     return count;
   }
@@ -237,7 +237,7 @@ describe("Game", () => {
       const game = Game.generate({width: 5, height: 5});
       const random = function(){
         var c = 0;
-        return function(){return (c++)/25;}
+        return function(){return (c++)/25;};
       }();
       for(var i=0;i<7;i++){
         game.grid[i]=[B.FOOD,{}];
@@ -250,7 +250,7 @@ describe("Game", () => {
   describe("#_$setBox", () => {
     it("updates the box and calls listeners", () => {
       const game = Game.generate({width: 5, height: 5});
-      const oldBox = "oldBox"
+      const oldBox = "oldBox";
       game.grid[7] = oldBox;
       const position = {x:2,y:1};
       var called = false;
@@ -266,7 +266,7 @@ describe("Game", () => {
       game._$setBox(snake.head, Box.generate.empty());
       for(var x=3;x<6;x++){
         game._$setBox({x,y:2}, Box.generate.snake(1, D.WEST, D.EAST));
-      };
+      }
       game._$setBox({x:3,y:2}, Box.generate.snake(1, D.SOUTH, D.EAST));
       snake.head = {x:3,y:2};
       snake.tail = {x:5,y:2};

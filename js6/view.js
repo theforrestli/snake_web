@@ -14,7 +14,7 @@ export default class View{
     // this.symbols[B.SNAKE] = this.svg.symbol()
     $(window).on("resize", (e) => {
       this.svg.size(window.width(),window.height());
-    })
+    });
     game.on('box',(p,b1,b2) => {
       this.setBox(p,b1,b2);
     });
@@ -31,7 +31,7 @@ export default class View{
   }
   setBox(p,b1,b2){
     var vbox = this.grid[p.y*this.game.json.width+p.x];
-    vbox.children().forEach((e) => e.remove())
+    vbox.children().forEach((e) => e.remove());
     switch(b2[0]){
     case B.EMPTY:break;
     case B.SNAKE:
