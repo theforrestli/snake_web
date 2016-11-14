@@ -1,59 +1,76 @@
-var {D,B,H} = require('consts');
-var map = require('map');
-var Game = require('game');
+const {D,B,H} = require('consts');
+const map = require('map');
+const Game = require('game');
+const _ = require('underscore');
 function validateGame(game){
 }
 function validateSnake(game,snake,full){
-  expect(snake).to.only.have.keys([
-    'age',
-    'head',
-    'index',
-    'length',
-    'name',
-    'pretty',
-    'remain',
-    'tick',
-    'tail',
-  ]);
-  expect(snake.head).to.only.have.keys(['x','y']);
-  expect(game.getBox(snake.head)).not.to.eql(null);
+  validateKeys();
+  validateHeadOrTail(snake.head);
+  validateHeadOrTail(snake.tail);
+  validateLength();
+  validateRemain();
+  validateSnakeBody();
 
-  expect(game.json.snakes[snake.index]).to.be(snake);
 
-  expect(snake.length).to.be.above(0);
-
-  expect(snake.remain).to.be.above(-1);
-
-  expect(snake.tail).to.only.have.keys(['x','y']);
-  expect(game.getBox(snake.tail)).not.to.eql(null);
-
-  var p1=snake.head;
-  var b1=game.getBox(p1);
-  expect(b1[1].s==snake.index);
-  if(b1[1].h==D.OTHER){//not moving
-    expect(snake.length).to.be(1);
-    expect(b1[1].t==D.OTHER_T);
-    expect(snake.tail).to.eql(p1);
-    return;
+  function validateKeys(){
+    expect(snake).to.only.have.keys([
+      'age',
+      'head',
+      'index',
+      'length',
+      'name',
+      'pretty',
+      'remain',
+      'tick',
+      'tail',
+    ]);
+  };
+  function validateHeadOrTail(head_or_tail){
+    expect(head_or_tail).to.only.have.keys(['x','y']);
+    expect(game.getBox(head_or_tail)).not.to.eql(null);
   }
-  var p2=H.applyDirection(p1,b1[1].t);
-  var b2=game.getBox(p2);
-  var length=1;
-  while(b2[0]==B.SNAKE && b2[1].s==snake.index){
+  function validateGame(){
+    expect(game.json.snakes[snake.index]).to.be(snake);
+  }
+  function validateLength(){
+    expect(snake.length).to.be.above(0);
+  }
+  function validateRemain(){
+    expect(snake.remain).to.be.above(-1);
+  }
+  function validateSnakeBody(){
+    let p1=snake.head;
+    let b1=game.getBox(p1);
+    //box belongs to the snake
     expect(b1[1].s==snake.index);
-    if(b1==b2){
-      expect(b1[1].t).to.be(D.OTHER_T);
-      break;
+    expect(b1[0]==B.SNAKE);
+    if(b1[1].h==D.OTHER){//not moving
+      //expect snake only have one box
+      expect(snake.length).to.be(1);
+      expect(b1[1].t==D.OTHER_T);
+      expect(snake.tail).to.eql(p1);
+      return;
     }
-    expect(b2[1].h == b1[1].t ^ D.OP_MASK);
-    p1=p2;
-    b1=b2;
-    p2=H.applyDirection(p1,b1[1].t);
-    b2=game.getBox(p2);
-    length++;
+    let length=1;
+    let limit=1000;
+    while(!_.isEqual(p1,snake.tail)&&limit-->0){
+      let p2=H.applyDirection(p1,b1[1].t);
+      let b2=game.getBox(p2);
+      //is snake
+      expect(b2[0]==B.SNAKE);
+      //is the snake
+      expect(b2[1].s==snake.index);
+      //connected
+      expect(b2[1].h==b1[1].t ^ D.OP_MASK);
+      //is still going to extend to the tail
+      expect(b1[1].t!=D.OTHER_T);
+      p1 = p2;
+      b1 = b2;
+      length++;
+    }
+    expect(snake.length).to.be(length);
   }
-  expect(snake.length).to.be(length);
-  expect(snake.tail).to.eql(p1);
 }
 describe("Game", () => {
   var game;

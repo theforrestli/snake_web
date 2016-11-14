@@ -1,12 +1,19 @@
 var socket_io = require('socket.io');
+var Game = require('../js6/game');
 var prefix = "/";
-var gen = function(json,id){
-  var io = socket_io(id);
+var gen = function(json){
+  var io = socket_io();
   var game = new Game(json);
+  const socketIdHash = {};
+  const gameIdHash = {};
   io.on("connection",(socket) => {
-    socket.emit("init", game.json);
-    socket.on("reload",(message) =>{
-      socket.emit("init", game.json);
+    socketIdHash[socket.id] = {};
+    socket.on("join",(id) =>{
+      socketData = socketIdHash[socket.id];
+      if(socketData.gameId === undefined && gameIdHash[id] === undefined){
+        socketData.gameId = id;
+        gameIdHash[id] = { socketId: socket.id };
+      }
     });
     socket.on("game", (message) => {
       io.emit("game", message);
@@ -20,7 +27,7 @@ var gen = function(json,id){
     io,
     game,
     tick
-  }
+  };
 };
 var message_valid = () => true;
 

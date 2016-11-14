@@ -18,6 +18,7 @@ module.exports = class Game extends EventEmitter{
       try{
         handlers[cmd[0]](cmd[1],this);
       }catch(e){
+        console.error("illegal command: "+cmd);
         console.error(e);
       }
     });
