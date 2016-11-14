@@ -9,13 +9,11 @@ var initData = {
   command_on_leave: ["l"],
   random_length: 128,
   name: "",
-}
+};
 createNamespace(io);
 function createNamespace(nsp){
   var history = [];
   nsp.on("connection",(socket) => {
-    debugger;
-
     console.log(`connected: ${socket.id}`);
     socket.join("default");
     global.socket=socket;
@@ -67,7 +65,7 @@ function createNamespace(nsp){
     socket.on("g", (data) => {
     });
     function broadcast(data){
-      const command = [socket.user_id, data]
+      const command = [socket.user_id, data];
       history.push(command);
       nsp.to("all", command);
     }

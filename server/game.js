@@ -4,9 +4,9 @@ var opt = {
   game: {},
   random_key_length: 128,
   period: 500,
-}
+};
 function generate(nsp, state){
-  return self = {
+  const self = {
     getId(socket, ids, ecb){
       const oldId = state.mapS2U[socket.id];
       if(!_.isArray(ids)){
@@ -54,11 +54,12 @@ function generate(nsp, state){
       }
     },
     broadcast(id, data){
-      const command = [id, data]
+      const command = [id, data];
       state.history.push(command);
       nsp.to("all").emit("b", command);
     },
   };
+  return self;
 }
 
 
@@ -69,7 +70,7 @@ function createNamespace(io, opt){
     history: [],
     mapU2S: {s: ''},
     mapS2U: {'': "s"},
-  }
+  };
   const methods = generate(nsp, state);
   nsp.on("connection",(socket) => {
     setupDebugger(nsp, socket);
@@ -118,4 +119,4 @@ function createNamespace(io, opt){
 module.exports = {
   createNamespace,
   generate,
-}
+};
