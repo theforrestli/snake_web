@@ -16,6 +16,9 @@ describe("Game", () => {
     setTimeout(done, 0);
   });
   afterEach((done) => {
+    _.forEach(this.io.sockets.sockets, (socket, id) => {
+      socket.disconnect();
+    });
     this.io.close();
     setTimeout(done, 0);
   });
@@ -49,23 +52,19 @@ describe("Game", () => {
         const nsp = game.createNamespace(this.io, getGameOpt({name: "test"}));
         const ioc1 = socket_io_client(`http://localhost:${testPort}/test`);
         new Promise((fulfill, reject) => {
-          ioc1.on("b",(json) => {
-            expect(json).to.eql(["s", ["j", "ioc1"]]);
-            ioc1.off("b");
-            fulfill();
-          });
+          ioc1.on("b",fulfill);
           ioc1.emit("join", ["ioc1","ioc2"]);
+        }).then((json) => {
+          expect(json).to.eql(["s", ["j", "ioc1"]]);
+          ioc1.off("b");
         }).then(() => {
+          const ioc2 = socket_io_client(`http://localhost:${testPort}/test`);
           return new Promise((fulfill, reject) => {
-            const ioc2 = socket_io_client(`http://localhost:${testPort}/test`);
-            ioc2.on("join", (json) => {
-              expect(json).to.eql({
-                new: "ioc2",
-              });
-              fulfill();
-            });
+            ioc2.on("join", fulfill);
             ioc2.emit("join", ["s", "ioc1","ioc2"]);
           });
+        }).then((json) => {
+          expect(json).to.eql({ new: "ioc2" });
         }).then(done).catch((e) => {console.error(e.stack);});
       });
     });
@@ -74,17 +73,14 @@ describe("Game", () => {
         const nsp = game.createNamespace(this.io, getGameOpt({name: "test"}));
         const ioc1 = socket_io_client(`http://localhost:${testPort}/test`);
         new Promise((fulfill, reject) => {
-          ioc1.on("err", (json) => {
-            expect(json).to.eql({
-              event: "b",
-              message: "does not have id yet",
-            });
-            fulfill();
-          });
-          ioc1.on("b", (json) => {
-            reject("received");
-          });
+          ioc1.on("err", fulfill);
+          ioc1.on("b", reject);
           ioc1.emit("b", "data");
+        }).then((json) => {
+          expect(json).to.eql({
+            event: "b",
+            message: "does not have id yet",
+          });
         }).then(done).catch((e) => {console.error(e.stack);});
       });
       it("broadcasts correct data", (done) => {
@@ -93,8 +89,10 @@ describe("Game", () => {
         new Promise((fulfill, reject) => {
           ioc1.emit("join", ["ioc1"]);
           ioc1.on("b", (json) => {
-            expect(json).to.eql(["ioc1","data"]);
-            fulfill();
+            if(json[0] == "ioc1"){
+              expect(json).to.eql(["ioc1","data"]);
+              fulfill();
+            }
           });
           ioc1.emit("b", "data");
         }).then(done).catch((e) => {console.error(e.stack);});
