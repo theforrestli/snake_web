@@ -15,17 +15,17 @@ function validateSnake(game,snake,full){
 
   function validateKeys(){
     expect(snake).to.only.have.keys([
-      'age',
-      'head',
-      'index',
-      'length',
-      'name',
-      'pretty',
-      'remain',
-      'tick',
-      'tail',
+      'age', //number of ticks since joined
+      'head', //position of head
+      'index', //index in game.snakes
+      'length', //cached length of snake
+      'name', //user friendly name of snake TODO: change to id and put name to snake.pretty
+      'pretty',//every not related to game mechanics
+      'remain',//number of length left to grow
+      'tick',//ticks left for the next move
+      'tail',//position of tail
     ]);
-  };
+  }
   function validateHeadOrTail(head_or_tail){
     expect(head_or_tail).to.only.have.keys(['x','y']);
     expect(game.getBox(head_or_tail)).not.to.eql(null);
@@ -135,7 +135,7 @@ describe("Game", () => {
         s:1
       }
     ]
-  }
+  };
   beforeEach(() => {
     var param = {
       width: 20,
@@ -172,7 +172,7 @@ describe("Game", () => {
         game.handleCommands([cmds.j222]);
         expect(game.getSnakeSize()).to.be(1);
       });
-    })
+    });
     describe("direction", () => {
       it("can change direction", () => {
         game.handleCommands([
@@ -272,7 +272,7 @@ describe("Game", () => {
       it("cannot leave nothing", () => {
         game.handleCommands([cmds.j222,cmds.l1]);
         expect(game.getSnakeSize()).to.be(1);
-      })
+      });
       it("cannot leave twice", () => {
         game.handleCommands([cmds.j222,cmds.l0,cmds.l0]);
         expect(game.getSnakeSize()).to.be(0);
