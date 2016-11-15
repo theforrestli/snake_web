@@ -92,6 +92,10 @@
         "publish game control",
       ],
     },
+    "ids": {
+      "socket_id": "socket io id",
+      "user_id": "id recognized within the game, cannot be 's'",
+    },
   },
   "server": [
     "socket.io only handles communication with channel",

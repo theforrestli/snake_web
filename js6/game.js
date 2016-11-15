@@ -1,16 +1,18 @@
 var {D,B,H} = require('consts');
 var {EventEmitter} = require('events');
+const _ = require("underscore");
 module.exports = class Game extends EventEmitter{
   constructor(json){
     super();
     if(json.version != 1)
       throw "wrong version";
     this.json = json;
-    var nsnake = this.json.snakes
-      .filter(x => x != null)
-      .length;
+    const user2index = new Map();
+    _.each(json.snakes, (snake, i) => {
+      user2index.set(snake.user_id, i);
+    });
     this.cache = {
-      nsnake,
+      user2index
     };
   }
   handleCommands(cmds){
@@ -44,6 +46,36 @@ module.exports = class Game extends EventEmitter{
     var b1 = this.json.grid[index];
     this.json.grid[index] = b2;
     this.emit("box",{x,y},b1,b2);
+  }
+  setSnake2(user_id, config){
+    var {x,y} = data;
+    var box = game.getBox({x,y});
+    var json = game.json;
+
+    if(box[0] != B.EMPTY){
+      throw "box taken";
+    }
+    var index = findNextEmpty(json.snakes);
+
+    var snake={
+      age: 0,
+      index,
+      head: {x,y},
+      length: 1,
+      name: data.name,
+      remain: data.remain,
+      tail: {x,y},
+      tick: 1,
+      pretty: config.pretty
+    };
+    game.setSnake(index,snake);
+
+    json.snakes[snake.index]=snake;
+    game.setBox({x,y},[ B.SNAKE, {
+      h:D.OTHER,
+      s:snake.index,
+      t:D.OTHER_T,
+    }]);
   }
 }
 var handlers = {
