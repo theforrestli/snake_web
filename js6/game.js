@@ -1,5 +1,6 @@
-var {D,B,H} = require('consts');
-var {EventEmitter} = require('events');
+const {D,B,H} = require('consts');
+const {EventEmitter} = require('events');
+const xor128 = require('seedrandom/lib/xor128');
 const _ = require("underscore");
 module.exports = class Game extends EventEmitter{
   constructor(json){
@@ -8,11 +9,15 @@ module.exports = class Game extends EventEmitter{
       throw "wrong version";
     this.json = json;
     const user2index = new Map();
-    _.each(json.snakes, (snake, i) => {
-      user2index.set(snake.user_id, i);
+    const random = xor128("", {state: json.seed});
+    _.each(json.snakes, (snake, index) => {
+      if(snake){
+        user2index.set(snake.user_id, index);
+      }
     });
     this.cache = {
-      user2index
+      user2index,
+      random,
     };
   }
   handleCommands(cmds){
@@ -20,7 +25,7 @@ module.exports = class Game extends EventEmitter{
       try{
         handlers[cmd[0]](cmd[1],this);
       }catch(e){
-        console.error("illegal command: "+cmd);
+        console.error("illegal command: "+JSON.stringify(cmd));
         console.error(e);
       }
     });
@@ -30,14 +35,15 @@ module.exports = class Game extends EventEmitter{
     return this.json.grid[index];
   }
   getSnakeSize(){
-    return this.cache.nsnake;
+    return this.cache.user2index.size;
   }
   setSnake(index,snake){
+    const oldSnake = this.json.snakes[index];
     if(this.json.snakes[index] != null){
-      this.cache.nsnake--;
+      this.cache.user2index.delete(oldSnake.user_id);
     }
     if(snake != null){
-      this.cache.nsnake++;
+      this.cache.user2index.set(snake.user_id, index);
     }
     this.json.snakes[index]=snake;
   }
@@ -47,37 +53,7 @@ module.exports = class Game extends EventEmitter{
     this.json.grid[index] = b2;
     this.emit("box",{x,y},b1,b2);
   }
-  setSnake2(user_id, config){
-    var {x,y} = data;
-    var box = game.getBox({x,y});
-    var json = game.json;
-
-    if(box[0] != B.EMPTY){
-      throw "box taken";
-    }
-    var index = findNextEmpty(json.snakes);
-
-    var snake={
-      age: 0,
-      index,
-      head: {x,y},
-      length: 1,
-      name: data.name,
-      remain: data.remain,
-      tail: {x,y},
-      tick: 1,
-      pretty: config.pretty
-    };
-    game.setSnake(index,snake);
-
-    json.snakes[snake.index]=snake;
-    game.setBox({x,y},[ B.SNAKE, {
-      h:D.OTHER,
-      s:snake.index,
-      t:D.OTHER_T,
-    }]);
-  }
-}
+};
 var handlers = {
   tick(data,game){
     var json = game.json;
@@ -183,14 +159,14 @@ var handlers = {
     }
     destroySnake(game,snake);
   }
-}
+};
 function findNextEmpty(list){
   var t=0;
   while(list[t] != null){
     t++;
   }
   return t;
-}
+};
 function destroySnake(game,snake){
   var p1 = snake.head;
   var b1 = game.getBox(snake.head);

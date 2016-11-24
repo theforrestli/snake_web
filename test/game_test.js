@@ -2,76 +2,9 @@ const {D,B,H} = require('consts');
 const map = require('map');
 const Game = require('game');
 const _ = require('underscore');
-function validateGame(game){
-}
-function validateSnake(game,snake,full){
-  validateKeys();
-  validateHeadOrTail(snake.head);
-  validateHeadOrTail(snake.tail);
-  validateLength();
-  validateRemain();
-  validateSnakeBody();
-
-
-  function validateKeys(){
-    expect(snake).to.only.have.keys([
-      'age', //number of ticks since joined
-      'head', //position of head
-      'index', //index in game.snakes
-      'length', //cached length of snake
-      'name', //user friendly name of snake TODO: change to id and put name to snake.pretty
-      'pretty',//every not related to game mechanics
-      'remain',//number of length left to grow
-      'tick',//ticks left for the next move
-      'tail',//position of tail
-    ]);
-  }
-  function validateHeadOrTail(head_or_tail){
-    expect(head_or_tail).to.only.have.keys(['x','y']);
-    expect(game.getBox(head_or_tail)).not.to.eql(null);
-  }
-  function validateGame(){
-    expect(game.json.snakes[snake.index]).to.be(snake);
-  }
-  function validateLength(){
-    expect(snake.length).to.be.above(0);
-  }
-  function validateRemain(){
-    expect(snake.remain).to.be.above(-1);
-  }
-  function validateSnakeBody(){
-    let p1=snake.head;
-    let b1=game.getBox(p1);
-    //box belongs to the snake
-    expect(b1[1].s==snake.index);
-    expect(b1[0]==B.SNAKE);
-    if(b1[1].h==D.OTHER){//not moving
-      //expect snake only have one box
-      expect(snake.length).to.be(1);
-      expect(b1[1].t==D.OTHER_T);
-      expect(snake.tail).to.eql(p1);
-      return;
-    }
-    let length=1;
-    let limit=1000;
-    while(!_.isEqual(p1,snake.tail)&&limit-->0){
-      let p2=H.applyDirection(p1,b1[1].t);
-      let b2=game.getBox(p2);
-      //is snake
-      expect(b2[0]==B.SNAKE);
-      //is the snake
-      expect(b2[1].s==snake.index);
-      //connected
-      expect(b2[1].h==b1[1].t ^ D.OP_MASK);
-      //is still going to extend to the tail
-      expect(b1[1].t!=D.OTHER_T);
-      p1 = p2;
-      b1 = b2;
-      length++;
-    }
-    expect(snake.length).to.be(length);
-  }
-}
+const {
+  validateSnake,
+} = require('./validators');
 describe("Game", () => {
   var game;
   var cmds = {
@@ -147,6 +80,7 @@ describe("Game", () => {
   describe("#handleCommands", () => {
     describe("join", () => {
       it("initializes snake", () => {
+        console.log(game.getBox({x:2,y:2}));
         game.handleCommands([cmds.j222]);
         expect(game.getSnakeSize()).to.be(1);
         var snake = game.json.snakes[0];

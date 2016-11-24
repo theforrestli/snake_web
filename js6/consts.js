@@ -16,13 +16,13 @@ exports.D = {
   OTHER  : 4,
   OTHER_T: 6,
   OP_MASK: 2,
-}
+};
 exports.B = {
   EMPTY: 0,
   SNAKE: 1,
   FOOD : 2,
   BLOCK: 3,
-}
+};
 exports.H = {
   applyDirection({x,y},d){
     switch(d){
@@ -37,4 +37,4 @@ exports.H = {
   cloneBox(b){
     return [b[0],$.extend({},b[1])];
   }
-}
+};

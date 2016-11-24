@@ -7,11 +7,21 @@ module.exports = function(param){
     grid[t]=[B.EMPTY,{}];
   }
   var game = {
-    "version":1,
-    "width": param.width,
-    "height": param.height,
-    "grid": grid,
-    "snakes":[],
+    version:1,
+    config: {
+      startRemain: 5,
+    },
+    seed: {
+      x: 1,
+      y: 2,
+      z: 3,
+      w: 4,
+    },
+    width: param.width,
+    height: param.height,
+    grid: grid,
+    snakes: [],
+    tick: 0,
   };
   return {game};
-}
+};

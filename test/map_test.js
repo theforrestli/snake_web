@@ -1,4 +1,5 @@
-var map = require('map');
+const map = require('map');
+const validators = require('./validators');
 describe("map", () => {
   var input;
   beforeEach(() => {
@@ -37,7 +38,11 @@ describe("map", () => {
       input.height = 1e10;
       expect(map).withArgs(input).to.throwException();
     });
-  })
+  });
   describe("game", () => {
-  })
+    it("creates valid game", () => {
+      const {game} = map(input);
+      validators.validateGame(game);
+    });
+  });
 });
