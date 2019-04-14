@@ -19,13 +19,14 @@ export default class View{
       this.setBox(p,b1,b2);
     });
   }
-  init(game){
+  init(){
     for(var t1 = 0;t1 < this.game.json.height;t1++){
       this.grid[t1] = [];
       for(var t2 = 0;t2 < this.game.json.width;t2++){
         var group = this.main.group();
-        group.translate(t1,t2);
+        group.translate(t2,t1);
         this.grid[t1*this.game.json.width+t2] = group;
+        this.setBox({x:t2, y:t1},undefined,this.game.json.grid[t1*this.game.json.width+t2]);
       }
     }
   }
@@ -40,7 +41,11 @@ export default class View{
       break;
     case B.FOOD:
       var circle = vbox.circle(1);
-      circle.fill({color:"#ff0"});
+      circle.fill({color:"#f00"});
+      break;
+    case B.BLOCK:
+      var rect = vbox.rect(1,1);
+      rect.fill({color:"#aaa"});
       break;
     }
   }

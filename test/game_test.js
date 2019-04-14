@@ -97,6 +97,7 @@ describe("Game", () => {
         expect(game.getSnakeSize()).to.be(1);
         expect(box1[0] === B.SNAKE);
 
+        debugger;
         game.handleCommands([cmds.j242]);
         expect(game.getSnakeSize()).to.be(2);
         expect(box2[0] === B.SNAKE);

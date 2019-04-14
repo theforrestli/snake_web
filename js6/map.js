@@ -6,6 +6,16 @@ module.exports = function(param){
   for(var t=0;t<size;t++){
     grid[t]=[B.EMPTY,{}];
   }
+  for(var t=0;t<param.width;t++) {
+    grid[t] = [B.BLOCK, {}]
+    grid[size-1-t] = [B.BLOCK, {}]
+  }
+  for(var t=0;t<param.height;t++) {
+    grid[t*param.width] = [B.BLOCK, {}]
+    grid[size-1-t*param.width] = [B.BLOCK, {}]
+  }
+
+
   var game = {
     version:1,
     config: {

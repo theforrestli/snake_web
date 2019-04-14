@@ -1,4 +1,3 @@
-
 var D_EAST  = 0;
 var D_SOUTH = 1;
 var D_WEST  = 2;

@@ -2,6 +2,7 @@ const {D,B,H} = require('consts');
 const {EventEmitter} = require('events');
 const xor128 = require('seedrandom/lib/xor128');
 const _ = require("underscore");
+const blobToBuffer = require('blob_to_buffer')
 module.exports = class Game extends EventEmitter{
   constructor(json){
     super();
@@ -12,7 +13,7 @@ module.exports = class Game extends EventEmitter{
     const random = xor128("", {state: json.seed});
     _.each(json.snakes, (snake, index) => {
       if(snake){
-        user2index.set(snake.user_id, index);
+        user2index.set(snake.name, index);
       }
     });
     this.cache = {
@@ -20,6 +21,104 @@ module.exports = class Game extends EventEmitter{
       random,
     };
   }
+  tick(){
+    const _this = this;
+    var json = this.json;
+    json.snakes.forEach(function(snake){
+      if(snake === undefined){
+        return;
+      }
+      if(--snake.tick !== 0){
+        return;
+      }
+      snake.tick = 1; //TODO
+      var p1 = snake.head;
+      var b1 = _this.getBox(snake.head);
+      if(b1[1].h == D.OTHER){
+        return;
+      }
+      var p2 = H.applyDirection(p1,b1[1].h);
+      var b2 = _this.getBox(p2);
+      switch(b2[0]){
+      case B.FOOD:
+        snake.remain += b2[1].q;
+        _this.setBox(p2,[ B.EMPTY, {} ])
+        //TODO
+        _this.setBox(_this.randomFreeLocation(), [ B.FOOD, {q: 1} ]);
+      case B.EMPTY:
+        _this.setBox(p2,[ B.SNAKE, {
+          h:b1[1].h,
+          t:b1[1].h ^ D.OP_MASK,
+          s:snake.index
+        }])
+        snake.head = p2;
+        if(snake.remain > 0){
+          snake.remain--;
+          snake.length++;
+          return;
+        }
+        p1 = snake.tail;
+        b1 = _this.getBox(p1);
+        p2 = H.applyDirection(p1, b1[1].h);
+        b2 = _this.getBox(p2);
+        snake.tail = p2;
+        _this.setBox(p1,[ B.EMPTY, {}]);
+        break;
+      case B.BLOCK:
+      case B.SNAKE:
+        destroySnake(_this,snake);
+        break;
+      }
+    })
+  }
+  randomFreeLocation() {
+    while(true) {
+      const r = randomRange(this.cache.random, this.json.width * this.json.height);
+      if(this.json.grid[r][0] == B.EMPTY) { return {x: r % this.json.width, y: (r/this.json.width)|0 } }
+    }
+  }
+  setSeed(seed) {
+    this.cache.random = xor128(seed, {state: true});
+  }
+  handleCommand2(cmd) {
+    const c = cmd[cmd.command];
+    switch(cmd.command) {
+      case "tickCommand":
+        if(c.randomSeed.length > 0){
+          this.setSeed(c.randomSeed);
+        }
+        this.tick();
+        break;
+      case "idCommand":
+        if(c.oldId == "" && c.newId != "") {
+          const {x, y} = this.randomFreeLocation();
+          this.join({x, y, name: c.newId, remain: 3});
+        } else if (c.oldId != "" && c.newId == "") {
+          var snake = this.json.snakes[this.cache.user2index.get(c.oldId)]
+          if(snake == undefined){
+            throw "snake not exist";
+          }
+          destroySnake(this,snake);
+        } else {
+          throw "unknown error";
+        }
+        break;
+      case "writerCommand":
+        const dir = c.command[0];
+        if(dir >= 4) {
+          throw "unknown dir";
+        }
+        var json = game.json;
+        var snake = json.snakes[this.cache.user2index.get(c.id)];
+        var box1 = game.getBox(snake.head);
+        if(box1[1].t == dir){
+          throw "move oppo";
+        }
+
+        box1[1].h = dir;
+    }
+  }
+
   handleCommands(cmds){
     cmds.forEach((cmd) => {
       try{
@@ -39,73 +138,18 @@ module.exports = class Game extends EventEmitter{
   }
   setSnake(index,snake){
     const oldSnake = this.json.snakes[index];
-    if(this.json.snakes[index] != null){
-      this.cache.user2index.delete(oldSnake.user_id);
+    if(this.json.snakes[index] != undefined){
+      this.cache.user2index.delete(oldSnake.name);
     }
-    if(snake != null){
-      this.cache.user2index.set(snake.user_id, index);
+    if(snake != undefined){
+      this.cache.user2index.set(snake.name, index);
     }
     this.json.snakes[index]=snake;
   }
-  setBox({x,y},b2){
-    var index = y*this.json.width+x;
-    var b1 = this.json.grid[index];
-    this.json.grid[index] = b2;
-    this.emit("box",{x,y},b1,b2);
-  }
-};
-var handlers = {
-  tick(data,game){
-    var json = game.json;
-    json.snakes.forEach(function(snake){
-      if(snake === undefined){
-        return;
-      }
-      if(--snake.tick !== 0){
-        return;
-      }
-      snake.tick = 1; //TODO
-      var p1 = snake.head;
-      var b1 = game.getBox(snake.head);
-      if(b1[1].h == D.OTHER){
-        return;
-      }
-      var p2 = H.applyDirection(p1,b1[1].h);
-      var b2 = game.getBox(p2);
-      switch(b2[0]){
-      case B.FOOD:
-        snake.remain += b2[1].q;
-        game.setBox(p2,[ B.EMPTY, {} ])
-      case B.EMPTY:
-        game.setBox(p2,[ B.SNAKE, {
-          h:b1[1].h,
-          t:b1[1].h ^ D.OP_MASK,
-          s:snake.index
-        }])
-        snake.head = p2;
-        if(snake.remain > 0){
-          snake.remain--;
-          snake.length++;
-          return;
-        }
-        p1 = snake.tail;
-        b1 = game.getBox(p1);
-        p2 = H.applyDirection(p1, b1[1].h);
-        b2 = game.getBox(p2);
-        snake.tail = p2;
-        game.setBox(p1,[ B.EMPTY, {}]);
-        break;
-      case B.BLOCK:
-      case B.SNAKE:
-        destroySnake(game,snake);
-        break;
-      }
-    })
-  },
-  join(data,game){
+  join(data) {
     var {x,y} = data;
-    var box = game.getBox({x,y});
-    var json = game.json;
+    var box = this.getBox({x,y});
+    var json = this.json;
 
     if(box[0] != B.EMPTY){
       throw "box taken";
@@ -123,20 +167,34 @@ var handlers = {
       tick: 1,
       pretty: data.pretty
     };
-    game.setSnake(index,snake);
+    this.setSnake(index,snake);
 
-    json.snakes[snake.index]=snake;
-    game.setBox({x,y},[ B.SNAKE, {
+    this.setBox({x,y},[ B.SNAKE, {
       h:D.OTHER,
       s:snake.index,
       t:D.OTHER_T,
     }]);
+    //TODO
+    this.setBox(this.randomFreeLocation(), [ B.FOOD, {q: 1} ]);
+  }
+  setBox({x,y},b2){
+    var index = y*this.json.width+x;
+    var b1 = this.json.grid[index];
+    this.json.grid[index] = b2;
+    this.emit("box",{x,y},b1,b2);
+  }
+};
+var handlers = {
+  tick(data,game){
+    game.tick();
+  },
+  join(data,game){
+    game.join(data);
   },
   direction(data,game){
     var json = game.json;
     var snake = json.snakes[data.s];
     var box1 = game.getBox(snake.head);
-
     if(box1[1].t == data.d){
       throw "move oppo";
     }
@@ -154,7 +212,7 @@ var handlers = {
   },
   leave(data,game){
     var snake = game.json.snakes[data.s]
-    if(snake == null){
+    if(snake == undefined){
       throw "snake not exist";
     }
     destroySnake(game,snake);
@@ -162,7 +220,7 @@ var handlers = {
 };
 function findNextEmpty(list){
   var t=0;
-  while(list[t] != null){
+  while(list[t] != undefined){
     t++;
   }
   return t;
@@ -175,5 +233,14 @@ function destroySnake(game,snake){
     p1 = H.applyDirection(p1, b1[1].t);
     b1 = game.getBox(p1);
   }
-  game.setSnake(snake.index,null);
+  game.setSnake(snake.index,undefined);
+}
+
+function randomRange(rand, range) {
+  const max = ((4294967296 / range) | 0) * range;
+  while(true) {
+    const next = rand.int32()+2147483648;
+    if(next < max) { return next % range; }
+  }
+  
 }

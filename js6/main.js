@@ -3,9 +3,18 @@
 // console.log("2π = " + math.sum(math.pi, math.pi));
 // var a = require('./test2');
 var tmpp = require('test');
-var View = require('view');
-var Game = require('game');
-var map = require('map');
+const View = require('view');
+const Game = require('game');
+const map = require('map');
+const conn = require('conn');
+window._ = require('underscore');
+window.protobuf = require("protobufjs");
+window.xor128 = require('seedrandom/lib/xor128');
+// window.blobToBuffer = require("blob-to-buffer");
+
+$('#button').on('click', () => {
+  conn($('#name').value(), $('#url').value());
+});
 var param = {
   width: 20,
   height: 20,
@@ -79,6 +88,7 @@ window.cmds = {
 
 window.game = game;
 window.view = view;
+window.conn = conn;
 
 
 // import Game from './game';

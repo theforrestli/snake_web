@@ -84,7 +84,7 @@ const V = {
   },
   validateSnake(game,snake,full){
     validateKeys();
-    validatePretty();
+    //validatePretty();
     validateHeadOrTail(snake.head);
     validateHeadOrTail(snake.tail);
     validateLength();
@@ -101,6 +101,7 @@ const V = {
         'pretty',//every not related to game mechanics
         'remain',//number of length left to grow
         'tick',//ticks left for the next move
+        'name',//id of snake
         'tail',//position of tail
       ]);
     }
