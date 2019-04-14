@@ -20,8 +20,8 @@ var param = {
   height: 20,
   version: 1,
 }
-var game = new Game(map(param).game);
-var view = new View($("#main")[0],game);
+// var game = new Game(map(param).game);
+// var view = new View($("#main")[0],game);
 var {D,B,H} = require('./consts.js');
 window.cmds = {
   "j222":[
@@ -86,8 +86,8 @@ window.cmds = {
   ]
 }
 
-window.game = game;
-window.view = view;
+// window.game = game;
+// window.view = view;
 window.conn = conn;
 
 

@@ -78,8 +78,9 @@ gulp.task('js', function(){
         debug: true,
         paths: ["js6","libs"],
       }).transform(babel, {
-        compact: false,
-        only: ["js6/*.js","test/*.js"]
+        presets: ["@babel/preset-env"],
+        test: ["js6/*.js","test/*.js"],
+        plugins: ["@babel/plugin-transform-runtime"],
       }));
     }
     rebundle(cfg);
