@@ -37,7 +37,7 @@ export default class View{
     case B.EMPTY:break;
     case B.SNAKE:
       var rect = vbox.rect(1,1);
-      rect.fill({color:"#000"});
+      rect.fill({color:colors[b2[1].s]});
       break;
     case B.FOOD:
       var circle = vbox.circle(1);
@@ -50,3 +50,12 @@ export default class View{
     }
   }
 }
+
+const colors = [
+  "#000",
+  "#00f",
+  "#0f0",
+  "#f442d9",
+  "#db7f00",
+  "#019ec1",
+]

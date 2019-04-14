@@ -19,6 +19,8 @@ module.exports = class Game extends EventEmitter{
     this.cache = {
       user2index,
       random,
+      //TODO
+      food: 0,
     };
   }
   tick(){
@@ -44,7 +46,11 @@ module.exports = class Game extends EventEmitter{
         snake.remain += b2[1].q;
         _this.setBox(p2,[ B.EMPTY, {} ])
         //TODO
-        _this.setBox(_this.randomFreeLocation(), [ B.FOOD, {q: 1} ]);
+        if(_this.cache.food>=0) {
+          _this.setBox(_this.randomFreeLocation(), [ B.FOOD, {q: 1} ]);
+        } else {
+          _this.cache.food++;
+        }
       case B.EMPTY:
         _this.setBox(p2,[ B.SNAKE, {
           h:b1[1].h,
@@ -67,6 +73,8 @@ module.exports = class Game extends EventEmitter{
       case B.BLOCK:
       case B.SNAKE:
         destroySnake(_this,snake);
+        const {x, y} = _this.randomFreeLocation();
+        _this.join({x, y, name: snake.name, remain: 3});
         break;
       }
     })
@@ -175,7 +183,11 @@ module.exports = class Game extends EventEmitter{
       t:D.OTHER_T,
     }]);
     //TODO
-    this.setBox(this.randomFreeLocation(), [ B.FOOD, {q: 1} ]);
+    if(this.cache.food>=0) {
+      this.setBox(this.randomFreeLocation(), [ B.FOOD, {q: 1} ]);
+    } else {
+      this.cache.food++;
+    }
   }
   setBox({x,y},b2){
     var index = y*this.json.width+x;
@@ -233,6 +245,7 @@ function destroySnake(game,snake){
     p1 = H.applyDirection(p1, b1[1].t);
     b1 = game.getBox(p1);
   }
+  game.cache.food--;
   game.setSnake(snake.index,undefined);
 }
 

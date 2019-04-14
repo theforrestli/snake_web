@@ -34,6 +34,11 @@
   <script src="vendor/svg.js"></script>
   <script src="js/main.js"></script>
   <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    console.log(id)
+    conn('id1', 'ws://35.203.149.76:8080/ws?room_id=room&id='+id)
     
   </script>
 </body>
