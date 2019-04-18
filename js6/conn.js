@@ -30,6 +30,7 @@ module.exports = function(id, url){
     window.game = game;
     const Commands = await CommandsP;
     var inited = 0;
+    var debugi = 0;
     ws.onmessage = (event) => {
       new Promise((resolve, reject) => {
         blobToBuffer(event.data, resolve);
@@ -37,7 +38,9 @@ module.exports = function(id, url){
         const cs = Commands.decode(buffer).commands;
         const time1 = new Date();
         for(var t=0;t<cs.length;t++){
+          try {
           game.handleCommand2(cs[t]);
+          } catch(err) {console.err(err);}
         }
         const time2 = new Date();
         if(inited != "initialized") {
