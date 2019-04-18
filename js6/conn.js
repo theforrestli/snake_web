@@ -6,11 +6,9 @@ const Game = require('game');
 const map = require('map');
 const blobToBuffer = require('blob_to_buffer')
 const protobuf = require("protobufjs");
-const protoFile = $.get("https://raw.githubusercontent.com/lijiaqigreat/personal_server/master/protobuf/command.proto")
 //TODO
-var Command = null;
-const CommandP = $.get("https://raw.githubusercontent.com/lijiaqigreat/personal_server/master/protobuf/command.proto").then(protoFile => {
-  Command = protobuf.parse(protoFile).root.lookup("Command")
+const CommandsP = $.get("https://raw.githubusercontent.com/lijiaqigreat/personal_server/master/protobuf/command.proto").then(protoFile => {
+  return protobuf.parse(protoFile).root.lookup("Commands");
 });
 
 const keyMap = {
@@ -27,28 +25,42 @@ module.exports = function(id, url){
     version: 1,
   }
   const ws = new WebSocket(url);
-  ws.onopen = () => {
+  ws.onopen = async () => {
     const game = new Game(map(param).game);
-    const view = new View($("#main")[0],game);
-    //TODO
     window.game = game;
-    window.view = view;
-    $("body").on("keydown", (e) => {
-      const dir = keyMap[e.key];
-      if(dir != undefined) {
-        ws.send(new Uint8Array([dir]));
-      }
-    });
-
+    const Commands = await CommandsP;
+    var inited = 0;
+    var debugi = 0;
     ws.onmessage = (event) => {
       new Promise((resolve, reject) => {
         blobToBuffer(event.data, resolve);
       }).then(buffer => {
-        const c = Command.decode(buffer);
-        console.log(c)
-        game.handleCommand2(c);
+        const cs = Commands.decode(buffer).commands;
+        const time1 = new Date();
+        for(var t=0;t<cs.length;t++){
+          try {
+          game.handleCommand2(cs[t]);
+          } catch(err) {console.err(err);}
+        }
+        const time2 = new Date();
+        if(inited != "initialized") {
+          clearTimeout(inited);
+          inited = setTimeout(() => {
+            inited = "initialized";
+            console.log("init view");
+            const view = new View($("#main")[0],game);
+            window.view = view;
+            $("body").on("keydown", (e) => {
+              const dir = keyMap[e.key];
+              if(dir != undefined) {
+                ws.send(new Uint8Array([dir]));
+              }
+            });
+          }, 100);
+        }
       });
     }
+
   };
   return ws;
 }
